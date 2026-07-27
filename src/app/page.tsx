@@ -1,4 +1,12 @@
 import Link from "next/link";
+import {
+  ClipboardList,
+  LineChart,
+  Sparkles,
+  Users,
+  ArrowRight,
+  CheckCircle2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -7,40 +15,51 @@ const FEATURES = [
     title: "Soru Takip Sistemi",
     description:
       "Öğrenciler her gün çözdükleri soruları derse ve konuya göre kaydeder; doğru, yanlış ve boş sayıları anında raporlanır.",
-    icon: "📊",
+    icon: ClipboardList,
   },
   {
     title: "İlerleme Paneli",
     description:
       "TYT ve AYT müfredatındaki her konu için doğruluk oranı, çalışma yoğunluğu ve genel ilerleme tek ekranda.",
-    icon: "📈",
+    icon: LineChart,
   },
   {
     title: "Yapay Zeka Önerileri",
     description:
-      "Öğrencinin verilerini analiz eden yapay zeka, her gün için somut ve motive edici bir çalışma planı önerir.",
-    icon: "🤖",
+      "Öğrencinin verilerini analiz eden akıllı motor, her gün için somut ve motive edici bir çalışma planı önerir.",
+    icon: Sparkles,
   },
   {
     title: "Koç Takip Ekranı",
     description:
       "Koçlar kendilerine atanan öğrencileri tek panelden izler, zayıf konuları görür ve özel notlar bırakır.",
-    icon: "🎯",
+    icon: Users,
   },
 ];
 
 const STEPS = [
   { title: "Kayıt Ol", description: "Öğrenci hesabını oluştur, alanını (Sayısal, Eşit Ağırlık, Sözel, Dil) seç." },
   { title: "Soru Çöz, Kaydet", description: "Her gün çözdüğün soruları birkaç saniyede sisteme gir." },
-  { title: "Takip Et", description: "Koçun ve yapay zeka, ilerlemene göre seni yönlendirsin." },
+  { title: "Takip Et", description: "Koçun ve akıllı öneri motoru, ilerlemene göre seni yönlendirsin." },
+];
+
+const MOCK_PROGRESS = [
+  { subject: "Matematik", value: 78 },
+  { subject: "Fizik", value: 54 },
+  { subject: "Türkçe", value: 91 },
 ];
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-1 flex-col">
-      <header className="border-b border-slate-200 bg-white">
+    <div className="flex flex-1 flex-col overflow-x-clip bg-white">
+      <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/80 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <span className="text-lg font-bold text-indigo-600">Metropol Koçluk</span>
+          <span className="flex items-center gap-2 text-lg font-bold text-slate-900">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm text-white">
+              MK
+            </span>
+            Metropol Koçluk
+          </span>
           <div className="flex items-center gap-2">
             <Link href="/giris">
               <Button variant="ghost" size="sm">
@@ -54,41 +73,124 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <section className="bg-gradient-to-b from-indigo-50 to-white px-4 py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="mb-4 inline-block rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
-            YKS&apos;ye Hazırlanan Öğrenciler İçin
-          </span>
-          <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-            Soru takibinden yapay zeka destekli çalışma planına, tek platform
-          </h1>
-          <p className="mx-auto mt-5 max-w-xl text-lg text-slate-600">
-            Metropol Koçluk; öğrencinin çözdüğü soruları, hangi konuda hangi aşamada olduğunu ve
-            koçlarının takibini tek bir profesyonel panelde birleştirir.
-          </p>
-          <div className="mt-8 flex justify-center gap-3">
-            <Link href="/kayit">
-              <Button size="lg">Ücretsiz Başla</Button>
-            </Link>
-            <Link href="/giris">
-              <Button size="lg" variant="outline">
-                Giriş Yap
-              </Button>
-            </Link>
+      <section className="relative isolate overflow-hidden px-4 pb-24 pt-20">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 -top-40 -z-10 flex justify-center blur-3xl"
+        >
+          <div className="h-[420px] w-[720px] bg-gradient-to-tr from-indigo-200 via-indigo-100 to-amber-100 opacity-60" />
+        </div>
+
+        <div className="mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-[1.1fr_1fr]">
+          <div>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-100">
+              <Sparkles className="h-3.5 w-3.5" />
+              YKS&apos;ye Hazırlanan Öğrenciler İçin
+            </span>
+            <h1 className="mt-5 text-4xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">
+              Soru takibinden akıllı çalışma planına, tek profesyonel platform
+            </h1>
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-slate-600">
+              Metropol Koçluk; öğrencinin çözdüğü soruları, hangi konuda hangi aşamada olduğunu ve
+              koçlarının takibini tek bir panelde birleştirir.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/kayit">
+                <Button size="lg" className="group">
+                  Ücretsiz Başla
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Button>
+              </Link>
+              <Link href="/giris">
+                <Button size="lg" variant="outline">
+                  Giriş Yap
+                </Button>
+              </Link>
+            </div>
+            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500">
+              {["Kurulum ücretsiz", "TYT & AYT tam müfredat", "Kredi kartı gerekmez"].map((item) => (
+                <li key={item} className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="relative">
+            <div
+              aria-hidden
+              className="absolute -right-6 -top-6 h-full w-full rounded-2xl bg-gradient-to-br from-indigo-600/10 to-amber-400/10"
+            />
+            <div className="relative rounded-2xl border border-slate-200 bg-white p-5 shadow-xl shadow-slate-200/60">
+              <div className="mb-4 flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                <span className="ml-3 text-xs font-medium text-slate-400">Panelim</span>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-lg bg-slate-50 p-3">
+                  <p className="text-xs text-slate-500">Bugün</p>
+                  <p className="text-xl font-bold text-slate-900">42</p>
+                </div>
+                <div className="rounded-lg bg-slate-50 p-3">
+                  <p className="text-xs text-slate-500">Bu Hafta</p>
+                  <p className="text-xl font-bold text-slate-900">286</p>
+                </div>
+                <div className="rounded-lg bg-slate-50 p-3">
+                  <p className="text-xs text-slate-500">Doğruluk</p>
+                  <p className="text-xl font-bold text-emerald-600">%76</p>
+                </div>
+              </div>
+              <div className="mt-4 space-y-3">
+                {MOCK_PROGRESS.map((p) => (
+                  <div key={p.subject}>
+                    <div className="mb-1 flex justify-between text-xs text-slate-600">
+                      <span>{p.subject}</span>
+                      <span>%{p.value}</span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-indigo-600"
+                        style={{ width: `${p.value}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 rounded-lg bg-indigo-50 p-3">
+                <p className="flex items-center gap-1.5 text-xs font-semibold text-indigo-700">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Bugünün Önerisi
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-indigo-900/80">
+                  Fizik &ndash; Elektrik ve Manyetizma konusunda doğruluğun düşük, bugün 15 soru daha
+                  çözerek pekiştir.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-16">
+      <section className="px-4 py-20">
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-center text-2xl font-semibold text-slate-900">Platform Neler Sunuyor?</h2>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mx-auto max-w-xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">Platform Neler Sunuyor?</h2>
+            <p className="mt-3 text-slate-600">
+              Öğrenciyi, koçu ve veriyi aynı ekranda buluşturan dört temel yapı taşı.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
-              <Card key={f.title}>
-                <CardContent className="pt-5">
-                  <div className="text-3xl">{f.icon}</div>
-                  <h3 className="mt-3 font-semibold text-slate-900">{f.title}</h3>
-                  <p className="mt-1.5 text-sm text-slate-600">{f.description}</p>
+              <Card key={f.title} className="border-slate-200/80 transition-shadow hover:shadow-md">
+                <CardContent className="pt-6">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                    <f.icon className="h-5 w-5" strokeWidth={2} />
+                  </div>
+                  <h3 className="mt-4 font-semibold text-slate-900">{f.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{f.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -96,30 +198,43 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="bg-slate-50 px-4 py-16">
+      <section className="border-y border-slate-200 bg-slate-50 px-4 py-20">
         <div className="mx-auto max-w-4xl">
-          <h2 className="text-center text-2xl font-semibold text-slate-900">Nasıl Çalışır?</h2>
-          <div className="mt-10 grid gap-8 sm:grid-cols-3">
+          <h2 className="text-center text-3xl font-bold tracking-tight text-slate-900">Nasıl Çalışır?</h2>
+          <div className="relative mt-14 grid gap-10 sm:grid-cols-3">
+            <div
+              aria-hidden
+              className="absolute left-0 right-0 top-5 hidden h-px bg-slate-200 sm:block"
+            />
             {STEPS.map((step, i) => (
-              <div key={step.title} className="text-center">
-                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white">
+              <div key={step.title} className="relative text-center">
+                <div className="relative mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white ring-4 ring-slate-50">
                   {i + 1}
                 </div>
-                <h3 className="mt-3 font-semibold text-slate-900">{step.title}</h3>
-                <p className="mt-1.5 text-sm text-slate-600">{step.description}</p>
+                <h3 className="mt-4 font-semibold text-slate-900">{step.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{step.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-16">
-        <div className="mx-auto max-w-3xl rounded-2xl bg-indigo-600 px-8 py-12 text-center">
-          <h2 className="text-2xl font-semibold text-white">Hazırlığına bugün başla</h2>
-          <p className="mt-2 text-indigo-100">
-            Hesabını oluştur, ilk soru kaydını ekle ve yapay zekanın senin için hazırladığı öneriyi gör.
+      <section className="px-4 py-20">
+        <div className="relative mx-auto max-w-3xl overflow-hidden rounded-2xl bg-indigo-600 px-8 py-14 text-center">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-amber-300/20 blur-2xl"
+          />
+          <h2 className="text-2xl font-bold text-white sm:text-3xl">Hazırlığına bugün başla</h2>
+          <p className="mx-auto mt-3 max-w-md text-indigo-100">
+            Hesabını oluştur, ilk soru kaydını ekle ve akıllı öneri motorunun senin için hazırladığı
+            planı gör.
           </p>
-          <Link href="/kayit" className="mt-6 inline-block">
+          <Link href="/kayit" className="mt-7 inline-block">
             <Button size="lg" variant="secondary">
               Hemen Kayıt Ol
             </Button>
@@ -127,8 +242,16 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-200 px-4 py-8 text-center text-sm text-slate-500">
-        © {new Date().getFullYear()} Metropol Koçluk. Tüm hakları saklıdır.
+      <footer className="border-t border-slate-200 px-4 py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm text-slate-500 sm:flex-row">
+          <span className="flex items-center gap-2 font-semibold text-slate-700">
+            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-indigo-600 text-[10px] text-white">
+              MK
+            </span>
+            Metropol Koçluk
+          </span>
+          <span>© {new Date().getFullYear()} Metropol Koçluk. Tüm hakları saklıdır.</span>
+        </div>
       </footer>
     </div>
   );
