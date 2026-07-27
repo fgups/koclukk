@@ -34,8 +34,10 @@ export default async function DenemelerPage({
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
-          <Target className="h-6 w-6 text-indigo-600" />
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold text-slate-900">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-sm">
+            <Target className="h-5 w-5" />
+          </span>
           Denemelerim
         </h1>
         <p className="mt-1 text-sm text-slate-500">Deneme sınavı net sonuçlarını kaydet, gelişimini izle.</p>

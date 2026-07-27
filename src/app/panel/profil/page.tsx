@@ -30,8 +30,10 @@ export default async function ProfilPage({
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
-          <UserCircle className="h-6 w-6 text-indigo-600" />
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold text-slate-900">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 text-white shadow-sm">
+            <UserCircle className="h-5 w-5" />
+          </span>
           Profilim
         </h1>
         <p className="mt-1 text-sm text-slate-500">Bilgilerini güncel tut.</p>

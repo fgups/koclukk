@@ -10,14 +10,14 @@ const POINTS = [
 export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-2">
-      <div className="relative hidden overflow-hidden bg-indigo-600 px-10 py-16 lg:flex lg:flex-col lg:justify-between">
+      <div className="relative hidden overflow-hidden bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 px-10 py-16 lg:flex lg:flex-col lg:justify-between">
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-2xl"
+          className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 animate-blob rounded-full bg-white/10 blur-2xl"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-20 -left-10 h-64 w-64 rounded-full bg-amber-300/20 blur-2xl"
+          className="pointer-events-none absolute -bottom-20 -left-10 h-64 w-64 animate-blob-slow rounded-full bg-amber-300/20 blur-2xl"
         />
         <Link href="/" className="flex items-center gap-2 text-lg font-bold text-white">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 text-sm">

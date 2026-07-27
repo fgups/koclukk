@@ -31,8 +31,10 @@ export default async function OnerilerPage({
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
-            <Sparkles className="h-6 w-6 text-indigo-600" />
+          <h1 className="flex items-center gap-2.5 text-2xl font-semibold text-slate-900">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-sm">
+              <Sparkles className="h-5 w-5" />
+            </span>
             AI Önerileri
           </h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -54,7 +56,7 @@ export default async function OnerilerPage({
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-indigo-200 bg-indigo-50/40">
+        <Card className="border-violet-200 bg-gradient-to-br from-violet-50 via-fuchsia-50/60 to-white">
           <CardHeader>
             <CardTitle>Bugünün Önerisi</CardTitle>
             <CardDescription>{new Date(latest.created_at).toLocaleString("tr-TR")}</CardDescription>

@@ -59,7 +59,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <div className="flex items-center gap-8">
             <Link href="/panel" className="flex items-center gap-2 text-lg font-bold text-slate-900">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm text-white">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 text-sm text-white shadow-sm shadow-indigo-600/30">
                 MK
               </span>
               <span className="hidden sm:inline">Metropol Koçluk</span>
@@ -84,10 +84,10 @@ export default async function PanelLayout({ children }: { children: React.ReactN
               <img
                 src={profile.avatar_url}
                 alt={profile.full_name}
-                className="h-9 w-9 rounded-full object-cover"
+                className="h-9 w-9 rounded-full object-cover ring-2 ring-indigo-100"
               />
             ) : (
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-sm font-semibold text-white">
                 {initials}
               </span>
             )}

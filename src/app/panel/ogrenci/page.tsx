@@ -114,7 +114,7 @@ export default async function OgrenciDashboardPage({
       </div>
 
       {remainingDays !== null && remainingDays >= 0 && (
-        <div className="flex items-center gap-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-5 py-4 text-white">
+        <div className="flex items-center gap-3 rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 px-5 py-4 text-white shadow-md shadow-indigo-600/20">
           <Target className="h-5 w-5 shrink-0" />
           <p className="text-sm font-medium">
             YKS&apos;ye <span className="text-lg font-bold">{remainingDays}</span> gün kaldı
@@ -134,7 +134,7 @@ export default async function OgrenciDashboardPage({
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardContent className="flex items-center gap-4 pt-5">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-blue-500 text-white shadow-sm">
               <ClipboardList className="h-5 w-5" />
             </span>
             <div>
@@ -145,7 +145,7 @@ export default async function OgrenciDashboardPage({
         </Card>
         <Card>
           <CardContent className="flex items-center gap-4 pt-5">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-sm">
               <TrendingUp className="h-5 w-5" />
             </span>
             <div>
@@ -156,7 +156,7 @@ export default async function OgrenciDashboardPage({
         </Card>
         <Card>
           <CardContent className="flex items-center gap-4 pt-5">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-sm">
               <Target className="h-5 w-5" />
             </span>
             <div>
@@ -212,27 +212,27 @@ export default async function OgrenciDashboardPage({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="border-indigo-200 bg-indigo-50/50 sm:col-span-3 lg:col-span-1">
+        <Card className="border-0 bg-gradient-to-br from-violet-600 to-fuchsia-600 sm:col-span-3 lg:col-span-1">
           <CardContent className="flex items-center justify-between pt-5">
             <div>
-              <p className="flex items-center gap-1.5 font-medium text-indigo-900">
+              <p className="flex items-center gap-1.5 font-medium text-white">
                 <Sparkles className="h-4 w-4" />
                 Bugün ne çalışmalıyım?
               </p>
-              <p className="mt-0.5 text-sm text-indigo-700">Akıllı öneri motorunu görüntüle.</p>
+              <p className="mt-0.5 text-sm text-violet-100">Akıllı öneri motorunu görüntüle.</p>
             </div>
             <Link
               href="/panel/ogrenci/oneriler"
-              className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+              className="rounded-lg bg-white px-3 py-2 text-sm font-medium text-violet-700 hover:bg-violet-50"
             >
               Gör
             </Link>
           </CardContent>
         </Card>
         <Link href="/panel/ogrenci/denemeler">
-          <Card className="h-full transition-shadow hover:shadow-md">
+          <Card className="h-full transition-all hover:-translate-y-0.5 hover:shadow-lg">
             <CardContent className="flex items-center gap-3 pt-5">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-sm">
                 <Target className="h-5 w-5" />
               </span>
               <div>
@@ -243,9 +243,9 @@ export default async function OgrenciDashboardPage({
           </Card>
         </Link>
         <Link href="/panel/ogrenci/gorevler">
-          <Card className="h-full transition-shadow hover:shadow-md">
+          <Card className="h-full transition-all hover:-translate-y-0.5 hover:shadow-lg">
             <CardContent className="flex items-center gap-3 pt-5">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-sm">
                 <ClipboardList className="h-5 w-5" />
               </span>
               <div>
