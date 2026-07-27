@@ -10,8 +10,18 @@ import { Input, Textarea } from "@/components/ui/input";
 import { MessageThread } from "@/components/chat/message-thread";
 import { NetTrendChart } from "@/components/charts/net-trend-chart";
 import { TaskToggle } from "@/components/tasks/task-toggle";
+import { TopicProgressView } from "@/components/progress/topic-progress-view";
 import { TRACK_LABELS, GRADE_LEVEL_LABELS } from "@/lib/types";
 import type { CoachNote, Message, MockExam, Profile, Task } from "@/lib/types";
+
+type RecentLog = {
+  id: string;
+  log_date: string;
+  correct_count: number;
+  wrong_count: number;
+  blank_count: number;
+  topics: { name: string; subjects: { name: string } | null } | null;
+};
 
 export default async function OgrenciDetayPage({
   params,
@@ -33,24 +43,32 @@ export default async function OgrenciDetayPage({
 
   if (!student) notFound();
 
-  const [stats, { data: notes }, { data: messages }, { data: mockExams }, { data: tasks }] = await Promise.all([
-    getTopicStats(supabase, studentId),
-    supabase
-      .from("coach_notes")
-      .select("*")
-      .eq("student_id", studentId)
-      .order("created_at", { ascending: false }),
-    viewer.role === "coach"
-      ? supabase
-          .from("messages")
-          .select("*")
-          .eq("coach_id", viewer.id)
-          .eq("student_id", studentId)
-          .order("created_at")
-      : Promise.resolve({ data: null }),
-    supabase.from("mock_exams").select("*").eq("student_id", studentId).order("exam_date"),
-    supabase.from("tasks").select("*").eq("student_id", studentId).order("created_at", { ascending: false }),
-  ]);
+  const [stats, { data: notes }, { data: messages }, { data: mockExams }, { data: tasks }, { data: recentLogs }] =
+    await Promise.all([
+      getTopicStats(supabase, studentId),
+      supabase
+        .from("coach_notes")
+        .select("*")
+        .eq("student_id", studentId)
+        .order("created_at", { ascending: false }),
+      viewer.role === "coach"
+        ? supabase
+            .from("messages")
+            .select("*")
+            .eq("coach_id", viewer.id)
+            .eq("student_id", studentId)
+            .order("created_at")
+        : Promise.resolve({ data: null }),
+      supabase.from("mock_exams").select("*").eq("student_id", studentId).order("exam_date"),
+      supabase.from("tasks").select("*").eq("student_id", studentId).order("created_at", { ascending: false }),
+      supabase
+        .from("question_logs")
+        .select("id, log_date, correct_count, wrong_count, blank_count, topics(name, subjects(name))")
+        .eq("student_id", studentId)
+        .order("log_date", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(15),
+    ]);
 
   const weakTopics = [...stats]
     .filter((t) => t.total > 0)
@@ -119,6 +137,41 @@ export default async function OgrenciDetayPage({
                   <Badge variant={((t.accuracy ?? 0) < 0.5 ? "danger" : "warning") as "danger" | "warning"}>
                     %{Math.round((t.accuracy ?? 0) * 100)}
                   </Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <TopicProgressView
+        stats={stats}
+        chartDescription="Öğrencinin en az 1 soru çözdüğü dersler."
+      />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Son Kayıtlar</CardTitle>
+          <CardDescription>Öğrencinin en son eklediği 15 soru kaydı.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!recentLogs || recentLogs.length === 0 ? (
+            <p className="text-sm text-slate-500">Henüz soru kaydı eklenmedi.</p>
+          ) : (
+            <ul className="divide-y divide-slate-100">
+              {(recentLogs as unknown as RecentLog[]).map((log) => (
+                <li key={log.id} className="flex items-center justify-between py-3 text-sm">
+                  <div>
+                    <p className="font-medium text-slate-900">{log.topics?.name ?? "Konu"}</p>
+                    <p className="text-slate-500">
+                      {log.topics?.subjects?.name} · {log.log_date}
+                    </p>
+                  </div>
+                  <div className="flex gap-1.5">
+                    <Badge variant="success">{log.correct_count} D</Badge>
+                    <Badge variant="danger">{log.wrong_count} Y</Badge>
+                    <Badge variant="neutral">{log.blank_count} B</Badge>
+                  </div>
                 </li>
               ))}
             </ul>
