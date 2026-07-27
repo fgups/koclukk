@@ -40,7 +40,7 @@ export async function setExamDate(formData: FormData) {
 
   const { error } = await supabase.rpc("admin_set_setting", {
     p_key: "exam_date",
-    p_value: JSON.stringify(examDate),
+    p_value: examDate,
   });
   if (error) {
     redirect("/panel/admin?error=" + encodeURIComponent(error.message));
