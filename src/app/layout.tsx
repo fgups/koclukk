@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Metropol Koçluk | YKS Öğrenci Takip Platformu",
+  title: "Albatros Koçluk | YKS Öğrenci Takip Platformu",
   description:
     "YKS'ye hazırlanan öğrenciler için soru takibi, ilerleme paneli ve yapay zeka destekli çalışma önerileri sunan koçluk platformu.",
 };

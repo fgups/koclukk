@@ -64,9 +64,9 @@ export default function LandingPage() {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <span className="flex items-center gap-2 text-lg font-bold text-slate-900">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 text-sm text-white shadow-sm shadow-indigo-600/30">
-              MK
+              AK
             </span>
-            Metropol Koçluk
+            Albatros Koçluk
           </span>
           <div className="flex items-center gap-2">
             <Link href="/giris">
@@ -102,7 +102,7 @@ export default function LandingPage() {
               <span className="text-gradient-brand">akıllı çalışma planına</span>, tek platform
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-slate-600">
-              Metropol Koçluk; öğrencinin çözdüğü soruları, hangi konuda hangi aşamada olduğunu ve
+              Albatros Koçluk; öğrencinin çözdüğü soruları, hangi konuda hangi aşamada olduğunu ve
               koçlarının takibini tek bir panelde birleştirir.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -266,11 +266,11 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm text-slate-500 sm:flex-row">
           <span className="flex items-center gap-2 font-semibold text-slate-700">
             <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-violet-600 text-[10px] text-white">
-              MK
+              AK
             </span>
-            Metropol Koçluk
+            Albatros Koçluk
           </span>
-          <span>© {new Date().getFullYear()} Metropol Koçluk. Tüm hakları saklıdır.</span>
+          <span>© {new Date().getFullYear()} Albatros Koçluk. Tüm hakları saklıdır.</span>
         </div>
       </footer>
     </div>

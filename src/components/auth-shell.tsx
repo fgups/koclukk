@@ -21,9 +21,9 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         />
         <Link href="/" className="flex items-center gap-2 text-lg font-bold text-white">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 text-sm">
-            MK
+            AK
           </span>
-          Metropol Koçluk
+          Albatros Koçluk
         </Link>
         <div className="max-w-sm">
           <h2 className="text-3xl font-bold leading-tight text-white">
@@ -40,7 +40,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
             ))}
           </ul>
         </div>
-        <p className="text-sm text-indigo-200">© {new Date().getFullYear()} Metropol Koçluk</p>
+        <p className="text-sm text-indigo-200">© {new Date().getFullYear()} Albatros Koçluk</p>
       </div>
 
       <div className="flex items-center justify-center bg-slate-50 px-4 py-12">

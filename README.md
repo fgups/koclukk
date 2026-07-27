@@ -1,4 +1,4 @@
-# Metropol Koçluk
+# Albatros Koçluk
 
 YKS'ye hazırlanan öğrenciler için soru takibi, ilerleme paneli, koç takip ekranı ve yapay zeka
 destekli günlük çalışma önerileri sunan platform.

@@ -60,9 +60,9 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           <div className="flex items-center gap-8">
             <Link href="/panel" className="flex items-center gap-2 text-lg font-bold text-slate-900">
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 text-sm text-white shadow-sm shadow-indigo-600/30">
-                MK
+                AK
               </span>
-              <span className="hidden sm:inline">Metropol Koçluk</span>
+              <span className="hidden sm:inline">Albatros Koçluk</span>
             </Link>
             <PanelNav items={nav} className="hidden gap-1 sm:flex" badges={badges} />
           </div>

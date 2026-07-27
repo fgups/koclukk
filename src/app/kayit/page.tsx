@@ -17,7 +17,7 @@ export default async function KayitPage({
     <AuthShell>
       <div className="mb-6 text-center lg:text-left">
         <Link href="/" className="text-xl font-bold text-indigo-600 lg:hidden">
-          Metropol Koçluk
+          Albatros Koçluk
         </Link>
         <h1 className="mt-2 text-2xl font-semibold text-slate-900">Öğrenci Kaydı</h1>
         <p className="mt-1 text-sm text-slate-500">

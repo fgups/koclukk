@@ -16,7 +16,7 @@ export default async function GirisPage({
     <AuthShell>
       <div className="mb-6 text-center lg:text-left">
         <Link href="/" className="text-xl font-bold text-indigo-600 lg:hidden">
-          Metropol Koçluk
+          Albatros Koçluk
         </Link>
         <h1 className="mt-2 text-2xl font-semibold text-slate-900">Giriş Yap</h1>
         <p className="mt-1 text-sm text-slate-500">Panelin için giriş yaparak devam et.</p>
