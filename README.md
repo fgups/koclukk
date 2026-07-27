@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Metropol Koçluk
 
-## Getting Started
+YKS'ye hazırlanan öğrenciler için soru takibi, ilerleme paneli, koç takip ekranı ve yapay zeka
+destekli günlük çalışma önerileri sunan platform.
 
-First, run the development server:
+## Kurulum
+
+### 1. Bağımlılıklar
+
+```bash
+npm install
+```
+
+### 2. Supabase projesi oluştur
+
+1. [supabase.com](https://supabase.com) üzerinden ücretsiz bir hesap aç ve yeni bir proje oluştur.
+2. Proje panelinde **Project Settings → API** bölümünden `Project URL` ve `anon public` key'i al.
+3. **SQL Editor**'e girip sırasıyla şu dosyaların içeriğini çalıştır:
+   - `supabase/migrations/0001_init.sql` (şema + RLS politikaları)
+   - `supabase/seed.sql` (TYT/AYT ders ve konu listesi)
+
+### 3. Ortam değişkenleri
+
+`.env.local.example` dosyasını `.env.local` olarak kopyala ve doldur:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+ANTHROPIC_API_KEY=...
+```
+
+`ANTHROPIC_API_KEY` için [console.anthropic.com](https://console.anthropic.com) üzerinden bir API
+anahtarı oluşturman gerekir (AI öneri motoru bunu kullanır).
+
+### 4. Geliştirme sunucusu
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 5. İlk yönetici (admin) hesabını oluşturma
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Roller varsayılan olarak `student`'tır; ilk admin'i elle atamak gerekir:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Siteye kayıt ol (`/kayit`).
+2. Supabase SQL Editor'de:
+   ```sql
+   update profiles set role = 'admin' where id = (
+     select id from auth.users where email = 'senin-mailin@ornek.com'
+   );
+   ```
+3. Artık `/panel/admin` üzerinden diğer kullanıcıları koç yapabilir, koç-öğrenci ataması
+   yapabilirsin.
 
-## Learn More
+## Proje yapısı
 
-To learn more about Next.js, take a look at the following resources:
+- `src/app` — sayfalar ve server action'lar (App Router)
+- `src/lib/supabase` — tarayıcı/sunucu Supabase client'ları ve middleware
+- `src/lib/ai/recommend.ts` — kural tabanlı önceliklendirme + Claude API ile öneri üretimi
+- `supabase/migrations` — veritabanı şeması ve RLS politikaları
+- `supabase/seed.sql` — TYT/AYT ders ve konu seed verisi
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Roller
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **student**: kendi soru kayıtlarını girer, ilerlemesini ve AI önerilerini görür.
+- **coach**: kendisine atanan öğrencileri izler, not bırakır.
+- **admin**: rolleri değiştirir, koç-öğrenci atamalarını yönetir, tüm öğrencileri görür.
