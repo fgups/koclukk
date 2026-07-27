@@ -26,11 +26,10 @@ npm install
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-ANTHROPIC_API_KEY=...
 ```
 
-`ANTHROPIC_API_KEY` için [console.anthropic.com](https://console.anthropic.com) üzerinden bir API
-anahtarı oluşturman gerekir (AI öneri motoru bunu kullanır).
+AI öneri motoru dışarıya API çağrısı yapmaz; öğrencinin verilerinden kural tabanlı olarak
+otomatik metin üretir, bu yüzden ek bir API anahtarı gerekmez.
 
 ### 4. Geliştirme sunucusu
 
@@ -56,7 +55,7 @@ Roller varsayılan olarak `student`'tır; ilk admin'i elle atamak gerekir:
 
 - `src/app` — sayfalar ve server action'lar (App Router)
 - `src/lib/supabase` — tarayıcı/sunucu Supabase client'ları ve middleware
-- `src/lib/ai/recommend.ts` — kural tabanlı önceliklendirme + Claude API ile öneri üretimi
+- `src/lib/ai/recommend.ts` — kural tabanlı önceliklendirme ve öneri metni üretimi (ücretsiz, API gerektirmez)
 - `supabase/migrations` — veritabanı şeması ve RLS politikaları
 - `supabase/seed.sql` — TYT/AYT ders ve konu seed verisi
 

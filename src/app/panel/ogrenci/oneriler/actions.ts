@@ -13,16 +13,7 @@ export async function createRecommendation() {
   const stats = await getTopicStats(supabase, profile.id);
   const relevant = filterRelevantTopics(stats, profile.track);
   const priority = pickPriorityTopics(relevant, 6);
-
-  let result: Awaited<ReturnType<typeof generateRecommendation>>;
-  try {
-    result = await generateRecommendation(profile.full_name, profile.track, priority);
-  } catch {
-    redirect(
-      "/panel/ogrenci/oneriler?error=" +
-        encodeURIComponent("Öneri oluşturulamadı. ANTHROPIC_API_KEY doğru tanımlanmış mı kontrol et."),
-    );
-  }
+  const result = generateRecommendation(profile.full_name, profile.track, priority);
 
   const { error } = await supabase.from("ai_recommendations").insert({
     student_id: profile.id,

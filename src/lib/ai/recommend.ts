@@ -1,6 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
 import type { Track, TopicStat, AiRecommendation } from "@/lib/types";
-import { TRACK_LABELS } from "@/lib/types";
 
 // AYT'de öğrencinin alanına göre hangi derslerin onu ilgilendirdiği (basitleştirilmiş eşleme).
 const TRACK_AYT_SUBJECTS: Record<Track, string[]> = {
@@ -41,61 +39,68 @@ interface GenerateResult {
   focus_topics: AiRecommendation["focus_topics"];
 }
 
+function suggestionLine(t: TopicStat): string {
+  if (t.total === 0) {
+    return `**${t.subject_name} – ${t.topic_name}**: Bu konudan hiç soru çözülmemiş. Konuyu kısaca tekrar edip 15-20 soru çözerek başla.`;
+  }
+  const accuracy = t.accuracy ?? 0;
+  if (accuracy < 0.5) {
+    return `**${t.subject_name} – ${t.topic_name}**: Doğruluk oranın %${Math.round(accuracy * 100)}. Önce yanlışlarını gözden geçir, ardından 15-20 soru daha çöz.`;
+  }
+  if (t.last_practiced) {
+    const daysSince = Math.floor(
+      (new Date().getTime() - new Date(t.last_practiced).getTime()) / 86400000,
+    );
+    if (daysSince >= 7) {
+      return `**${t.subject_name} – ${t.topic_name}**: Son çalışmandan bu yana ${daysSince} gün geçmiş. Unutmamak için 10-15 soruluk bir tekrar yap.`;
+    }
+  }
+  return `**${t.subject_name} – ${t.topic_name}**: Doğruluk oranın %${Math.round(accuracy * 100)}. Bu tempoyu korumak için 10 soru daha çöz.`;
+}
+
+const CLOSING_LINES = [
+  "Küçük ama düzenli adımlar büyük farkı yaratır, bugün de bir adım at!",
+  "Az ve öz çalışsan bile istikrarlı olursan ilerleme kesin.",
+  "Bugünkü hedefini tamamladığında yarın bir adım daha öndesin.",
+];
+
 /**
- * Kural tabanlı önceliklendirmenin çıktısını Claude API ile öğrenciye yönelik,
- * motive edici ve somut bir Türkçe çalışma önerisine çevirir.
+ * Kural tabanlı önceliklendirmenin çıktısını, dışarıya API çağrısı yapmadan
+ * öğrenciye yönelik somut bir Türkçe günlük çalışma önerisine çevirir.
  */
-export async function generateRecommendation(
+export function generateRecommendation(
   fullName: string,
-  track: Track | null,
+  _track: Track | null,
   priorityTopics: TopicStat[],
-): Promise<GenerateResult> {
-  const focusTopics = priorityTopics.slice(0, 3).map((t) => ({
+): GenerateResult {
+  const top = priorityTopics.slice(0, 3);
+
+  const focusTopics = top.map((t) => ({
     topic_name: t.topic_name,
     subject_name: t.subject_name,
     reason:
       t.total === 0
         ? "Bu konudan hiç soru çözülmemiş."
-        : `Son kayıtlarda doğruluk oranı %${Math.round((t.accuracy ?? 0) * 100)}${
+        : `Doğruluk oranı %${Math.round((t.accuracy ?? 0) * 100)}${
             t.last_practiced ? `, son çalışma: ${t.last_practiced}` : ""
           }.`,
   }));
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  if (top.length === 0) {
+    return {
+      recommendation_text:
+        "Henüz bir soru kaydın yok. Bugün birkaç soru çözüp kaydet, bir sonraki önerini o verilere göre hazırlayalım.",
+      focus_topics: [],
+    };
+  }
 
-  const statsSummary = priorityTopics
-    .slice(0, 8)
-    .map((t) => {
-      const acc = t.accuracy === null ? "veri yok" : `%${Math.round(t.accuracy * 100)} doğruluk`;
-      return `- ${t.subject_name} / ${t.topic_name} (${t.exam_type}): ${t.total} soru çözülmüş, ${acc}, son çalışma: ${
-        t.last_practiced ?? "hiç"
-      }`;
-    })
-    .join("\n");
-
-  const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 500,
-    system:
-      "Sen bir YKS koçluk asistanısın. Öğrencinin soru çözüm istatistiklerine bakarak bugün için kısa, somut, " +
-      "motive edici bir Türkçe çalışma planı yazıyorsun. En fazla 120 kelime kullan, madde işaretleri kullanabilirsin. " +
-      "Asla veri uydurma, sadece sana verilen istatistiklere dayan.",
-    messages: [
-      {
-        role: "user",
-        content: `Öğrenci: ${fullName || "Öğrenci"}\nAlan: ${track ? TRACK_LABELS[track] : "belirtilmemiş"}\n\nÖncelikli konu istatistikleri:\n${statsSummary || "Henüz hiç soru kaydı yok."}\n\nBu bilgilere göre bugün için bir çalışma önerisi yaz.`,
-      },
-    ],
-  });
-
-  const text = message.content
-    .filter((block) => block.type === "text")
-    .map((block) => block.text)
-    .join("\n")
-    .trim();
+  const name = fullName || "Merhaba";
+  const intro = `${name}, bugünkü çalışma önerin:`;
+  const lines = top.map((t, i) => `${i + 1}. ${suggestionLine(t)}`);
+  const closing = CLOSING_LINES[Math.floor(Math.random() * CLOSING_LINES.length)];
 
   return {
-    recommendation_text: text || "Bugün için öneri oluşturulamadı, lütfen tekrar dene.",
+    recommendation_text: [intro, ...lines, "", closing].join("\n"),
     focus_topics: focusTopics,
   };
 }
