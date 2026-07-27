@@ -46,7 +46,7 @@ export default async function ProfilPage({
           <CardDescription>Fotoğrafın ve bilgilerin koçun/öğrencilerinle paylaşılır.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={updateProfile} encType="multipart/form-data" className="space-y-5">
+          <form action={updateProfile} className="space-y-5">
             <div className="flex items-center gap-4">
               {profile.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element

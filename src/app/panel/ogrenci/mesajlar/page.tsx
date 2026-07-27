@@ -13,7 +13,9 @@ export default async function OgrenciMesajlarPage() {
     .select("profiles!coach_students_coach_id_fkey(*)")
     .eq("student_id", profile.id);
 
-  const coaches = ((assignments ?? []) as unknown as { profiles: Profile }[]).map((a) => a.profiles);
+  const coaches = ((assignments ?? []) as unknown as { profiles: Profile | null }[])
+    .map((a) => a.profiles)
+    .filter((c): c is Profile => c !== null);
 
   if (coaches.length === 0) {
     return (

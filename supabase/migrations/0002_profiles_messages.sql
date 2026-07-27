@@ -27,8 +27,6 @@ insert into storage.buckets (id, name, public)
 values ('avatars', 'avatars', true)
 on conflict (id) do nothing;
 
-alter table storage.objects enable row level security;
-
 create policy avatars_public_read on storage.objects for select
   using (bucket_id = 'avatars');
 
