@@ -45,3 +45,22 @@ body {
   -webkit-background-clip: text;
   color: transparent;
 }
+
+.bg-dot-grid {
+  background-image: radial-gradient(circle, #c7d2fe 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float-y 5s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-y 5s ease-in-out infinite;
+  animation-delay: 1.5s;
+}

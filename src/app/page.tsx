@@ -6,9 +6,34 @@ import {
   Users,
   ArrowRight,
   CheckCircle2,
+  Flame,
+  CheckCheck,
+  Calculator,
+  Atom,
+  FlaskConical,
+  Dna,
+  BookOpen,
+  Landmark,
+  Globe2,
+  Brain,
+  Languages,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+
+const SUBJECTS = [
+  { name: "Türkçe", icon: BookOpen, from: "from-rose-500", to: "to-pink-500" },
+  { name: "Matematik", icon: Calculator, from: "from-indigo-500", to: "to-blue-500" },
+  { name: "Geometri", icon: Calculator, from: "from-blue-500", to: "to-cyan-500" },
+  { name: "Fizik", icon: Atom, from: "from-sky-500", to: "to-indigo-500" },
+  { name: "Kimya", icon: FlaskConical, from: "from-emerald-500", to: "to-green-500" },
+  { name: "Biyoloji", icon: Dna, from: "from-teal-500", to: "to-emerald-500" },
+  { name: "Edebiyat", icon: BookOpen, from: "from-fuchsia-500", to: "to-pink-500" },
+  { name: "Tarih", icon: Landmark, from: "from-amber-500", to: "to-yellow-500" },
+  { name: "Coğrafya", icon: Globe2, from: "from-lime-500", to: "to-emerald-500" },
+  { name: "Felsefe", icon: Brain, from: "from-violet-500", to: "to-purple-500" },
+  { name: "Din Kültürü", icon: Languages, from: "from-orange-500", to: "to-amber-500" },
+];
 
 const FEATURES = [
   {
@@ -84,6 +109,10 @@ export default function LandingPage() {
       <section className="relative isolate overflow-hidden px-4 pb-24 pt-20">
         <div
           aria-hidden
+          className="bg-dot-grid pointer-events-none absolute inset-0 -z-20 opacity-40 [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,black,transparent)]"
+        />
+        <div
+          aria-hidden
           className="pointer-events-none absolute -top-32 -left-32 -z-10 h-[420px] w-[420px] animate-blob rounded-full bg-gradient-to-br from-indigo-300 to-violet-300 opacity-50 blur-3xl"
         />
         <div
@@ -128,11 +157,29 @@ export default function LandingPage() {
             </ul>
           </div>
 
-          <div className="relative">
+          <div className="relative pt-6 pr-6 pb-10 pl-2">
             <div
               aria-hidden
               className="absolute -right-6 -top-6 h-full w-full rounded-2xl bg-gradient-to-br from-indigo-600/15 via-violet-500/10 to-pink-400/15"
             />
+            <div
+              aria-hidden
+              className="animate-float absolute -top-2 -left-2 z-10 hidden items-center gap-1.5 rounded-xl bg-white px-3 py-2 shadow-lg shadow-amber-900/10 ring-1 ring-slate-100 sm:flex"
+            >
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 text-white">
+                <Flame className="h-4 w-4" />
+              </span>
+              <span className="text-xs font-semibold text-slate-700">12 gün seri</span>
+            </div>
+            <div
+              aria-hidden
+              className="animate-float-delayed absolute -bottom-4 -right-2 z-10 hidden items-center gap-1.5 rounded-xl bg-white px-3 py-2 shadow-lg shadow-emerald-900/10 ring-1 ring-slate-100 sm:flex"
+            >
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 text-white">
+                <CheckCheck className="h-4 w-4" />
+              </span>
+              <span className="text-xs font-semibold text-slate-700">Görev tamamlandı</span>
+            </div>
             <div className="relative rounded-2xl border border-slate-200 bg-white p-5 shadow-xl shadow-indigo-950/10">
               <div className="mb-4 flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
@@ -216,6 +263,36 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section className="relative overflow-hidden px-4 py-20">
+        <div
+          aria-hidden
+          className="bg-dot-grid pointer-events-none absolute inset-0 -z-10 opacity-30 [mask-image:radial-gradient(ellipse_70%_70%_at_50%_50%,black,transparent)]"
+        />
+        <div className="mx-auto max-w-4xl text-center">
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            Tüm TYT &amp; AYT Dersleri Tek Yerde
+          </h2>
+          <p className="mt-3 text-slate-600">
+            Hangi dersten çalışırsan çalış, sistem her konuyu ve doğruluğunu ayrı ayrı takip eder.
+          </p>
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            {SUBJECTS.map((s) => (
+              <span
+                key={s.name}
+                className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br ${s.from} ${s.to} text-white`}
+                >
+                  <s.icon className="h-3.5 w-3.5" />
+                </span>
+                {s.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="relative overflow-hidden border-y border-slate-200 bg-slate-50 px-4 py-20">
         <div className="mx-auto max-w-4xl">
           <h2 className="text-center text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
@@ -262,15 +339,45 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-200 px-4 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm text-slate-500 sm:flex-row">
-          <span className="flex items-center gap-2 font-semibold text-slate-700">
-            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-violet-600 text-[10px] text-white">
-              AK
+      <footer className="border-t border-slate-200 bg-slate-50 px-4 py-14">
+        <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-3">
+          <div>
+            <span className="flex items-center gap-2 font-semibold text-slate-700">
+              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 to-violet-600 text-[11px] text-white">
+                AK
+              </span>
+              Albatros Koçluk
             </span>
-            Albatros Koçluk
-          </span>
-          <span>© {new Date().getFullYear()} Albatros Koçluk. Tüm hakları saklıdır.</span>
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-slate-500">
+              YKS&apos;ye hazırlanan öğrenciler için soru takibi, ilerleme paneli ve akıllı çalışma
+              önerileri sunan koçluk platformu.
+            </p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-900">Platform</p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-500">
+              <li>
+                <Link href="/kayit" className="hover:text-indigo-600">
+                  Öğrenci Kaydı
+                </Link>
+              </li>
+              <li>
+                <Link href="/giris" className="hover:text-indigo-600">
+                  Giriş Yap
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-900">Dersler</p>
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-slate-500">
+              Türkçe, Matematik, Geometri, Fizik, Kimya, Biyoloji, Edebiyat, Tarih, Coğrafya, Felsefe
+              ve Din Kültürü &ndash; tüm TYT &amp; AYT müfredatı.
+            </p>
+          </div>
+        </div>
+        <div className="mx-auto mt-10 max-w-6xl border-t border-slate-200 pt-6 text-sm text-slate-500">
+          © {new Date().getFullYear()} Albatros Koçluk. Tüm hakları saklıdır.
         </div>
       </footer>
     </div>
