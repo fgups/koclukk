@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
@@ -23,6 +24,7 @@ export function MessageThread({
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
+  const router = useRouter();
 
   useEffect(() => {
     const channel = supabase
@@ -49,7 +51,13 @@ export function MessageThread({
   }, [messages.length]);
 
   useEffect(() => {
-    supabase.rpc("mark_thread_read", { p_coach_id: coachId, p_student_id: studentId });
+    supabase.rpc("mark_thread_read", { p_coach_id: coachId, p_student_id: studentId }).then(({ error }) => {
+      // Refresh the server-rendered panel layout (which computes the unread
+      // badge) — Next.js doesn't refetch a persisted layout's data on its own
+      // after a client-side navigation, so without this the badge would stay
+      // stale until the next full reload.
+      if (!error) router.refresh();
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coachId, studentId]);
 
