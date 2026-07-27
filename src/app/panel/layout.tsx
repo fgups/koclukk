@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireProfile } from "@/lib/auth";
 import { signOut } from "@/lib/actions/auth";
+import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { PanelNav } from "@/components/panel-nav";
 import { TRACK_LABELS } from "@/lib/types";
@@ -9,6 +10,8 @@ const NAV_BY_ROLE = {
   student: [
     { href: "/panel/ogrenci", label: "Panelim" },
     { href: "/panel/ogrenci/ilerleme", label: "İlerlemem" },
+    { href: "/panel/ogrenci/denemeler", label: "Denemelerim" },
+    { href: "/panel/ogrenci/gorevler", label: "Görevlerim" },
     { href: "/panel/ogrenci/oneriler", label: "AI Önerileri" },
     { href: "/panel/ogrenci/mesajlar", label: "Mesajlar" },
     { href: "/panel/profil", label: "Profilim" },
@@ -27,6 +30,21 @@ const NAV_BY_ROLE = {
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const profile = await requireProfile();
   const nav = NAV_BY_ROLE[profile.role];
+
+  const supabase = await createClient();
+  const { count: unreadCount } = await supabase
+    .from("messages")
+    .select("id", { count: "exact", head: true })
+    .or(`coach_id.eq.${profile.id},student_id.eq.${profile.id}`)
+    .neq("sender_id", profile.id)
+    .is("read_at", null);
+
+  const badges: Record<string, number> | undefined =
+    profile.role === "student"
+      ? { "/panel/ogrenci/mesajlar": unreadCount ?? 0 }
+      : profile.role === "coach"
+        ? { "/panel/kocluk": unreadCount ?? 0 }
+        : undefined;
   const initials = (profile.full_name || "?")
     .trim()
     .split(/\s+/)
@@ -46,7 +64,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
               </span>
               <span className="hidden sm:inline">Metropol Koçluk</span>
             </Link>
-            <PanelNav items={nav} className="hidden gap-1 sm:flex" />
+            <PanelNav items={nav} className="hidden gap-1 sm:flex" badges={badges} />
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden text-right sm:block">
@@ -83,6 +101,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         <PanelNav
           items={nav}
           className="flex gap-1 overflow-x-auto border-t border-slate-100 px-4 py-2 sm:hidden"
+          badges={badges}
         />
       </header>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>

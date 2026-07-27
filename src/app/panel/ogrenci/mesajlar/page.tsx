@@ -1,3 +1,4 @@
+import { MessageCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +21,10 @@ export default async function OgrenciMesajlarPage() {
   if (coaches.length === 0) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold text-slate-900">Mesajlar</h1>
+        <h1 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+          <MessageCircle className="h-6 w-6 text-indigo-600" />
+          Mesajlar
+        </h1>
         <Card>
           <CardContent className="pt-5 text-sm text-slate-500">
             Henüz bir koça atanmadın. Atandığında koçunla buradan yazışabileceksin.
@@ -44,7 +48,10 @@ export default async function OgrenciMesajlarPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-slate-900">Mesajlar</h1>
+      <h1 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+        <MessageCircle className="h-6 w-6 text-indigo-600" />
+        Mesajlar
+      </h1>
       {threads.map(({ coach, messages }) => (
         <Card key={coach.id}>
           <CardHeader>

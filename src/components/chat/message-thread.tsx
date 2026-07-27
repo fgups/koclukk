@@ -48,6 +48,11 @@ export function MessageThread({
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
+  useEffect(() => {
+    supabase.rpc("mark_thread_read", { p_coach_id: coachId, p_student_id: studentId });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coachId, studentId]);
+
   async function handleSend() {
     const text = body.trim();
     if (!text || sending) return;

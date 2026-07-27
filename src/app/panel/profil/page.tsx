@@ -1,3 +1,4 @@
+import { UserCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { updateProfile } from "./actions";
@@ -29,7 +30,10 @@ export default async function ProfilPage({
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Profilim</h1>
+        <h1 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+          <UserCircle className="h-6 w-6 text-indigo-600" />
+          Profilim
+        </h1>
         <p className="mt-1 text-sm text-slate-500">Bilgilerini güncel tut.</p>
       </div>
 

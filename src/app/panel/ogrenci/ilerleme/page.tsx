@@ -1,3 +1,4 @@
+import { LineChart } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { getTopicStats } from "@/lib/stats";
@@ -39,7 +40,10 @@ export default async function IlerlemePage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">İlerlemem</h1>
+        <h1 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+          <LineChart className="h-6 w-6 text-indigo-600" />
+          İlerlemem
+        </h1>
         <p className="mt-1 text-sm text-slate-500">
           Toplam {totalSolved} soru çözdün, {startedTopics}/{stats.length} konuya başladın.
         </p>
@@ -77,7 +81,7 @@ export default async function IlerlemePage() {
                 {stats.map((t) => {
                   const status = statusFor(t.total, t.accuracy);
                   return (
-                    <tr key={t.topic_id}>
+                    <tr key={t.topic_id} className="hover:bg-slate-50">
                       <td className="py-2 pr-4 whitespace-nowrap text-slate-500">
                         {t.subject_name} <span className="text-xs">({t.exam_type})</span>
                       </td>

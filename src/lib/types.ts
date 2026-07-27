@@ -79,6 +79,37 @@ export interface Message {
   student_id: string;
   sender_id: string;
   body: string;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface SubjectNet {
+  subject_name: string;
+  correct: number;
+  wrong: number;
+  net: number;
+}
+
+export interface MockExam {
+  id: string;
+  student_id: string;
+  exam_name: string;
+  exam_type: ExamType;
+  exam_date: string;
+  subject_nets: SubjectNet[];
+  total_net: number;
+  created_at: string;
+}
+
+export interface Task {
+  id: string;
+  coach_id: string;
+  student_id: string;
+  title: string;
+  description: string | null;
+  due_date: string | null;
+  is_done: boolean;
+  completed_at: string | null;
   created_at: string;
 }
 

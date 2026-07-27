@@ -2,14 +2,16 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { getTopicStats } from "@/lib/stats";
-import { addCoachNote } from "./actions";
+import { addCoachNote, assignTask } from "./actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/input";
+import { Input, Textarea } from "@/components/ui/input";
 import { MessageThread } from "@/components/chat/message-thread";
+import { NetTrendChart } from "@/components/charts/net-trend-chart";
+import { TaskToggle } from "@/components/tasks/task-toggle";
 import { TRACK_LABELS, GRADE_LEVEL_LABELS } from "@/lib/types";
-import type { CoachNote, Message, Profile } from "@/lib/types";
+import type { CoachNote, Message, MockExam, Profile, Task } from "@/lib/types";
 
 export default async function OgrenciDetayPage({
   params,
@@ -31,7 +33,7 @@ export default async function OgrenciDetayPage({
 
   if (!student) notFound();
 
-  const [stats, { data: notes }, { data: messages }] = await Promise.all([
+  const [stats, { data: notes }, { data: messages }, { data: mockExams }, { data: tasks }] = await Promise.all([
     getTopicStats(supabase, studentId),
     supabase
       .from("coach_notes")
@@ -46,6 +48,8 @@ export default async function OgrenciDetayPage({
           .eq("student_id", studentId)
           .order("created_at")
       : Promise.resolve({ data: null }),
+    supabase.from("mock_exams").select("*").eq("student_id", studentId).order("exam_date"),
+    supabase.from("tasks").select("*").eq("student_id", studentId).order("created_at", { ascending: false }),
   ]);
 
   const weakTopics = [...stats]
@@ -54,6 +58,13 @@ export default async function OgrenciDetayPage({
     .slice(0, 5);
   const untouchedCount = stats.filter((t) => t.total === 0).length;
   const total = stats.reduce((sum, t) => sum + t.total, 0);
+
+  const examList = (mockExams ?? []) as MockExam[];
+  const netChartData = examList.map((e) => ({
+    label: new Date(e.exam_date).toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit" }),
+    net: e.total_net,
+  }));
+  const taskList = (tasks ?? []) as Task[];
 
   const s = student as Profile;
   const initials = (s.full_name || "?")
@@ -140,6 +151,63 @@ export default async function OgrenciDetayPage({
             ))}
             {(!notes || notes.length === 0) && (
               <li className="text-sm text-slate-500">Henüz not eklenmedi.</li>
+            )}
+          </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Deneme Sonuçları</CardTitle>
+          <CardDescription>Öğrencinin net gelişimi.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <NetTrendChart data={netChartData} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Görevler</CardTitle>
+          <CardDescription>Öğrenciye görev ata, tamamlanma durumunu takip et.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {viewer.role === "coach" && (
+            <form action={assignTask} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+              <input type="hidden" name="student_id" value={studentId} />
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-500">Başlık</label>
+                <Input name="title" placeholder="Örn. 20 türev sorusu çöz" required />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-500">Son Tarih (opsiyonel)</label>
+                <Input name="due_date" type="date" />
+              </div>
+              <Button type="submit" size="sm">
+                Görev Ata
+              </Button>
+            </form>
+          )}
+          <ul className="divide-y divide-slate-100">
+            {taskList.map((task) => (
+              <li key={task.id} className="flex items-start gap-3 py-3">
+                <div className="pt-0.5">
+                  <TaskToggle taskId={task.id} initialDone={task.is_done} />
+                </div>
+                <div className="flex-1">
+                  <p className={`text-sm font-medium ${task.is_done ? "text-slate-400 line-through" : "text-slate-900"}`}>
+                    {task.title}
+                  </p>
+                  {task.due_date && (
+                    <p className="text-xs text-slate-500">
+                      Son tarih: {new Date(task.due_date).toLocaleDateString("tr-TR")}
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
+            {taskList.length === 0 && (
+              <li className="py-3 text-sm text-slate-500">Henüz görev atanmadı.</li>
             )}
           </ul>
         </CardContent>

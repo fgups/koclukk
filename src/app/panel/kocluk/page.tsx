@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Users2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { getTopicStats } from "@/lib/stats";
@@ -43,7 +44,10 @@ export default async function KocPanelPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Öğrencilerim</h1>
+        <h1 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+          <Users2 className="h-6 w-6 text-indigo-600" />
+          Öğrencilerim
+        </h1>
         <p className="mt-1 text-sm text-slate-500">
           {students.length} öğrenci takip ediyorsun.
         </p>
