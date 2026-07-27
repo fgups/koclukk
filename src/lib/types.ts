@@ -1,6 +1,7 @@
 export type Role = "student" | "coach" | "admin";
 export type Track = "sayisal" | "esit_agirlik" | "sozel" | "dil";
 export type ExamType = "TYT" | "AYT";
+export type GradeLevel = "9" | "10" | "11" | "12" | "mezun";
 
 export const TRACK_LABELS: Record<Track, string> = {
   sayisal: "Sayısal",
@@ -9,12 +10,26 @@ export const TRACK_LABELS: Record<Track, string> = {
   dil: "Dil",
 };
 
+export const GRADE_LEVEL_LABELS: Record<GradeLevel, string> = {
+  "9": "9. Sınıf",
+  "10": "10. Sınıf",
+  "11": "11. Sınıf",
+  "12": "12. Sınıf",
+  mezun: "Mezun",
+};
+
 export interface Profile {
   id: string;
   full_name: string;
   role: Role;
   track: Track | null;
   created_at: string;
+  avatar_url: string | null;
+  school: string | null;
+  grade_level: GradeLevel | null;
+  birth_date: string | null;
+  phone: string | null;
+  bio: string | null;
 }
 
 export interface Subject {
@@ -55,6 +70,15 @@ export interface AiRecommendation {
   rec_date: string;
   recommendation_text: string;
   focus_topics: { topic_name: string; subject_name: string; reason: string }[];
+  created_at: string;
+}
+
+export interface Message {
+  id: string;
+  coach_id: string;
+  student_id: string;
+  sender_id: string;
+  body: string;
   created_at: string;
 }
 

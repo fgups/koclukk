@@ -7,8 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
-import { TRACK_LABELS } from "@/lib/types";
-import type { CoachNote, Profile } from "@/lib/types";
+import { MessageThread } from "@/components/chat/message-thread";
+import { TRACK_LABELS, GRADE_LEVEL_LABELS } from "@/lib/types";
+import type { CoachNote, Message, Profile } from "@/lib/types";
 
 export default async function OgrenciDetayPage({
   params,
@@ -19,7 +20,7 @@ export default async function OgrenciDetayPage({
 }) {
   const { studentId } = await params;
   const { error } = await searchParams;
-  await requireProfile();
+  const viewer = await requireProfile();
   const supabase = await createClient();
 
   const { data: student } = await supabase
@@ -30,13 +31,21 @@ export default async function OgrenciDetayPage({
 
   if (!student) notFound();
 
-  const [stats, { data: notes }] = await Promise.all([
+  const [stats, { data: notes }, { data: messages }] = await Promise.all([
     getTopicStats(supabase, studentId),
     supabase
       .from("coach_notes")
       .select("*")
       .eq("student_id", studentId)
       .order("created_at", { ascending: false }),
+    viewer.role === "coach"
+      ? supabase
+          .from("messages")
+          .select("*")
+          .eq("coach_id", viewer.id)
+          .eq("student_id", studentId)
+          .order("created_at")
+      : Promise.resolve({ data: null }),
   ]);
 
   const weakTopics = [...stats]
@@ -46,16 +55,39 @@ export default async function OgrenciDetayPage({
   const untouchedCount = stats.filter((t) => t.total === 0).length;
   const total = stats.reduce((sum, t) => sum + t.total, 0);
 
+  const s = student as Profile;
+  const initials = (s.full_name || "?")
+    .trim()
+    .split(/\s+/)
+    .map((c) => c[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold text-slate-900">
-          {(student as Profile).full_name || "İsimsiz Öğrenci"}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          {(student as Profile).track ? TRACK_LABELS[(student as Profile).track!] : "Alan belirtilmemiş"}
-          {" · "}Toplam {total} soru çözülmüş, {untouchedCount} konuya hiç başlanmamış
-        </p>
+      <div className="flex items-start gap-4">
+        {s.avatar_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={s.avatar_url} alt={s.full_name} className="h-14 w-14 rounded-full object-cover" />
+        ) : (
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-100 text-lg font-semibold text-indigo-700">
+            {initials}
+          </span>
+        )}
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">{s.full_name || "İsimsiz Öğrenci"}</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {s.track ? TRACK_LABELS[s.track] : "Alan belirtilmemiş"}
+            {" · "}Toplam {total} soru çözülmüş, {untouchedCount} konuya hiç başlanmamış
+          </p>
+          <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500">
+            {s.school && <span>🏫 {s.school}</span>}
+            {s.grade_level && <span>{GRADE_LEVEL_LABELS[s.grade_level]}</span>}
+            {s.phone && <span>📞 {s.phone}</span>}
+          </p>
+          {s.bio && <p className="mt-2 max-w-xl text-sm text-slate-600">{s.bio}</p>}
+        </div>
       </div>
 
       <Card>
@@ -112,6 +144,23 @@ export default async function OgrenciDetayPage({
           </ul>
         </CardContent>
       </Card>
+
+      {viewer.role === "coach" && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Mesajlar</CardTitle>
+            <CardDescription>Öğrenciyle doğrudan yazış.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <MessageThread
+              coachId={viewer.id}
+              studentId={studentId}
+              currentUserId={viewer.id}
+              initialMessages={(messages ?? []) as Message[]}
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

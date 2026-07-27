@@ -10,11 +10,17 @@ const NAV_BY_ROLE = {
     { href: "/panel/ogrenci", label: "Panelim" },
     { href: "/panel/ogrenci/ilerleme", label: "İlerlemem" },
     { href: "/panel/ogrenci/oneriler", label: "AI Önerileri" },
+    { href: "/panel/ogrenci/mesajlar", label: "Mesajlar" },
+    { href: "/panel/profil", label: "Profilim" },
   ],
-  coach: [{ href: "/panel/kocluk", label: "Öğrencilerim" }],
+  coach: [
+    { href: "/panel/kocluk", label: "Öğrencilerim" },
+    { href: "/panel/profil", label: "Profilim" },
+  ],
   admin: [
     { href: "/panel/kocluk", label: "Öğrenciler" },
     { href: "/panel/admin", label: "Yönetim" },
+    { href: "/panel/profil", label: "Profilim" },
   ],
 } as const;
 
@@ -55,9 +61,18 @@ export default async function PanelLayout({ children }: { children: React.ReactN
                     : "Yönetici"}
               </p>
             </div>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
-              {initials}
-            </span>
+            {profile.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={profile.avatar_url}
+                alt={profile.full_name}
+                className="h-9 w-9 rounded-full object-cover"
+              />
+            ) : (
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
+                {initials}
+              </span>
+            )}
             <form action={signOut}>
               <Button variant="outline" size="sm" type="submit">
                 Çıkış

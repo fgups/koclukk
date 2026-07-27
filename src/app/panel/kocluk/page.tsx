@@ -60,11 +60,31 @@ export default async function KocPanelPage() {
           {summaries.map(({ student, total, accuracy, weakest }) => (
             <Link key={student.id} href={`/panel/kocluk/${student.id}`}>
               <Card className="h-full transition-shadow hover:shadow-md">
-                <CardHeader>
-                  <CardTitle>{student.full_name || "İsimsiz Öğrenci"}</CardTitle>
-                  <CardDescription>
-                    {student.track ? TRACK_LABELS[student.track] : "Alan belirtilmemiş"}
-                  </CardDescription>
+                <CardHeader className="flex-row items-center gap-3 space-y-0">
+                  {student.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={student.avatar_url}
+                      alt={student.full_name}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
+                      {(student.full_name || "?")
+                        .trim()
+                        .split(/\s+/)
+                        .map((c) => c[0])
+                        .slice(0, 2)
+                        .join("")
+                        .toUpperCase()}
+                    </span>
+                  )}
+                  <div>
+                    <CardTitle>{student.full_name || "İsimsiz Öğrenci"}</CardTitle>
+                    <CardDescription>
+                      {student.track ? TRACK_LABELS[student.track] : "Alan belirtilmemiş"}
+                    </CardDescription>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-2 pt-0">
                   <div className="flex items-center justify-between text-sm">
