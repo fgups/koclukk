@@ -14,8 +14,9 @@ const ALLOWED_IMAGE_TYPES: Record<string, string> = {
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
   if (!user) redirect("/giris");
 
   const fullName = String(formData.get("full_name") ?? "").trim();

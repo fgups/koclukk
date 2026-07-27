@@ -25,9 +25,14 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
+  // getSession() reads the JWT from cookies without a network round-trip to
+  // Supabase Auth on every request (unlike getUser()). This is safe here because
+  // middleware only decides whether to show a redirect for UX; every actual data
+  // read/write is independently re-authorized by Postgres RLS using the same JWT.
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
 
   const { pathname } = request.nextUrl;
   const isPublic = PUBLIC_PATHS.some(

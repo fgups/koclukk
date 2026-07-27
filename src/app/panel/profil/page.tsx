@@ -16,8 +16,9 @@ export default async function ProfilPage({
   const profile = await requireProfile();
   const supabase = await createClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
 
   const initials = (profile.full_name || "?")
     .trim()

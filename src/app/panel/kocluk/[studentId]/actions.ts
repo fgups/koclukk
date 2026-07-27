@@ -7,8 +7,9 @@ import { createClient } from "@/lib/supabase/server";
 export async function addCoachNote(formData: FormData) {
   const supabase = await createClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
   if (!user) redirect("/giris");
 
   const studentId = String(formData.get("student_id") ?? "");
@@ -35,8 +36,9 @@ export async function addCoachNote(formData: FormData) {
 export async function assignTask(formData: FormData) {
   const supabase = await createClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
   if (!user) redirect("/giris");
 
   const studentId = String(formData.get("student_id") ?? "");

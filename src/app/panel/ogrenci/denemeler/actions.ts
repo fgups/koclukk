@@ -8,8 +8,9 @@ import type { ExamType, SubjectNet } from "@/lib/types";
 export async function addMockExam(formData: FormData) {
   const supabase = await createClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
   if (!user) redirect("/giris");
 
   const examName = String(formData.get("exam_name") ?? "").trim();
