@@ -20,6 +20,36 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { CountUp } from "@/components/count-up";
+
+const STATS = [
+  { value: 11, suffix: "", label: "Ders" },
+  { value: 174, suffix: "+", label: "Konu" },
+  { value: 2, suffix: "", label: "Sınav Türü (TYT & AYT)" },
+];
+
+const FAQS = [
+  {
+    q: "Platforma kayıt olmak ücretli mi?",
+    a: "Hayır, öğrenci hesabı oluşturmak tamamen ücretsizdir ve kredi kartı istemez.",
+  },
+  {
+    q: "Koçum kim olacak, nasıl atanıyor?",
+    a: "Kayıt olduktan sonra yönetici seni bir koça atar. Koçun; ilerlemeni, çözdüğün soruları ve zayıf olduğun konuları görebilir, seninle doğrudan mesajlaşabilir.",
+  },
+  {
+    q: "Akıllı öneri sistemi tam olarak nasıl çalışıyor?",
+    a: "Sistem, hangi konularda az soru çözdüğünü, doğruluk oranının düşük olduğunu ve en son ne zaman çalıştığını analiz ederek her gün için öncelikli konulardan oluşan somut bir çalışma önerisi hazırlar.",
+  },
+  {
+    q: "Verilerim güvende mi, koçum dışında kimse görebilir mi?",
+    a: "Hayır. Soru kayıtların ve mesajların yalnızca sana ve sana atanmış koça açıktır; başka öğrenciler veya koçlar erişemez.",
+  },
+  {
+    q: "Telefon veya bilgisayardan kullanabilir miyim?",
+    a: "Evet, platform tarayıcı üzerinden çalışır; telefon, tablet veya bilgisayardan ekstra bir uygulama indirmeden kullanabilirsin.",
+  },
+];
 
 const SUBJECTS = [
   { name: "Türkçe", icon: BookOpen, from: "from-rose-500", to: "to-pink-500" },
@@ -232,6 +262,19 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section className="border-b border-slate-200 bg-white px-4 py-12">
+        <div className="mx-auto grid max-w-4xl grid-cols-3 gap-6 text-center">
+          {STATS.map((s) => (
+            <div key={s.label}>
+              <p className="text-4xl font-extrabold text-gradient-brand sm:text-5xl">
+                <CountUp target={s.value} suffix={s.suffix} />
+              </p>
+              <p className="mt-1 text-sm font-medium text-slate-500">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="px-4 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="mx-auto max-w-xl text-center">
@@ -311,6 +354,30 @@ export default function LandingPage() {
                 <h3 className="mt-4 font-semibold text-slate-900">{step.title}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{step.description}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-20">
+        <div className="mx-auto max-w-3xl">
+          <h2 className="text-center text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            Sıkça Sorulan Sorular
+          </h2>
+          <div className="mt-10 space-y-3">
+            {FAQS.map((item) => (
+              <details
+                key={item.q}
+                className="group rounded-xl border border-slate-200 bg-white/70 p-5 shadow-sm shadow-slate-900/5 backdrop-blur-sm open:shadow-md"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-slate-900">
+                  {item.q}
+                  <span className="ml-4 shrink-0 text-indigo-600 transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">{item.a}</p>
+              </details>
             ))}
           </div>
         </div>
