@@ -69,7 +69,7 @@ export default async function DenemelerPage({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Net Gelişimi</CardTitle>
             <CardDescription>Zaman içindeki toplam net değişimin.</CardDescription>

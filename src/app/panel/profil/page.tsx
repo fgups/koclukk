@@ -142,6 +142,48 @@ export default async function ProfilPage({
               />
             </div>
 
+            {profile.role === "student" && (
+              <div className="space-y-4 border-t border-slate-100 pt-5">
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900">YKS Hedeflerim</h3>
+                  <p className="mt-0.5 text-xs text-slate-500">Panelindeki hedef kartlarında ve ilerleme çubuğunda kullanılır.</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="target_department">Hedef Bölüm</Label>
+                    <Input
+                      id="target_department"
+                      name="target_department"
+                      defaultValue={profile.target_department ?? ""}
+                      placeholder="Örn. Bilgisayar Mühendisliği"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="target_rank">Hedef Sıralama</Label>
+                    <Input
+                      id="target_rank"
+                      name="target_rank"
+                      type="number"
+                      min={1}
+                      defaultValue={profile.target_rank ?? ""}
+                      placeholder="Örn. 50000"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="daily_question_goal">Günlük Soru Hedefi</Label>
+                  <Input
+                    id="daily_question_goal"
+                    name="daily_question_goal"
+                    type="number"
+                    min={1}
+                    defaultValue={profile.daily_question_goal ?? ""}
+                    placeholder="Örn. 100"
+                  />
+                </div>
+              </div>
+            )}
+
             <Button type="submit">Kaydet</Button>
           </form>
         </CardContent>

@@ -147,6 +147,19 @@ export async function getNetTrend(supabase: SupabaseClient, studentId: string): 
   return Math.round((data[0].total_net - data[1].total_net) * 100) / 100;
 }
 
+/** Öğrencinin tüm zamanlar toplam doğru/yanlış sayısından genel başarı yüzdesini hesaplar. */
+export async function getOverallAccuracy(supabase: SupabaseClient, studentId: string): Promise<number | null> {
+  const { data } = await supabase
+    .from("question_logs")
+    .select("correct_count, wrong_count")
+    .eq("student_id", studentId);
+
+  const totals = (data ?? []) as { correct_count: number; wrong_count: number }[];
+  const correct = totals.reduce((sum, l) => sum + l.correct_count, 0);
+  const wrong = totals.reduce((sum, l) => sum + l.wrong_count, 0);
+  return correct + wrong > 0 ? Math.round((correct / (correct + wrong)) * 100) : null;
+}
+
 /** En son ne zaman soru kaydı eklendiğini (varsa) döner. */
 export async function getLastActivityDate(
   supabase: SupabaseClient,

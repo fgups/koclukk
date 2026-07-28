@@ -1,14 +1,30 @@
 import Link from "next/link";
-import { Award, CalendarDays, ClipboardList, Flame, Sparkles, Target, TrendingUp } from "lucide-react";
+import {
+  Award,
+  BarChart3,
+  CalendarDays,
+  CheckSquare,
+  ClipboardList,
+  Flame,
+  GraduationCap,
+  Percent,
+  Sparkles,
+  Target,
+  Trophy,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
-import { getDailyActivity } from "@/lib/stats";
+import { getDailyActivity, getOverallAccuracy } from "@/lib/stats";
 import { computeCurrentStreak, computeLongestStreak, getBadges } from "@/lib/gamification";
 import { QuestionLogForm } from "./log-form";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BadgeList } from "@/components/gamification/badge-list";
 import { StudyHeatmap } from "@/components/progress/study-heatmap";
+import { TaskToggle } from "@/components/tasks/task-toggle";
+import { NetTrendChart } from "@/components/charts/net-trend-chart";
+import { WeeklyStudyChart } from "@/components/charts/weekly-study-chart";
+import type { MockExam, Task } from "@/lib/types";
 
 function startOfWeekISO(): string {
   const now = new Date();
@@ -33,6 +49,9 @@ export default async function OgrenciDashboardPage({
   const profile = await requireProfile();
   const supabase = await createClient();
 
+  const weekStart = startOfWeekISO();
+  const today = new Date().toISOString().slice(0, 10);
+
   const [
     { data: subjects },
     { data: topics },
@@ -40,6 +59,10 @@ export default async function OgrenciDashboardPage({
     { data: examDateSetting },
     { data: allLogDates },
     dailyActivity,
+    overallAccuracy,
+    { data: weekLogs },
+    { data: openTasks },
+    { data: mockExams },
   ] = await Promise.all([
     supabase.from("subjects").select("id, name, exam_type").order("exam_type").order("name"),
     supabase.from("topics").select("id, name, subject_id").order("order_index"),
@@ -53,16 +76,21 @@ export default async function OgrenciDashboardPage({
     supabase.from("app_settings").select("value").eq("key", "exam_date").maybeSingle(),
     supabase.from("question_logs").select("log_date").eq("student_id", profile.id),
     getDailyActivity(supabase, profile.id),
+    getOverallAccuracy(supabase, profile.id),
+    supabase
+      .from("question_logs")
+      .select("correct_count, wrong_count, blank_count, log_date")
+      .eq("student_id", profile.id)
+      .gte("log_date", weekStart),
+    supabase
+      .from("tasks")
+      .select("*")
+      .eq("student_id", profile.id)
+      .eq("is_done", false)
+      .order("due_date", { nullsFirst: false })
+      .limit(5),
+    supabase.from("mock_exams").select("*").eq("student_id", profile.id).order("exam_date"),
   ]);
-
-  const weekStart = startOfWeekISO();
-  const today = new Date().toISOString().slice(0, 10);
-
-  const { data: weekLogs } = await supabase
-    .from("question_logs")
-    .select("correct_count, wrong_count, blank_count, log_date")
-    .eq("student_id", profile.id)
-    .gte("log_date", weekStart);
 
   const todayTotal = (weekLogs ?? [])
     .filter((l) => l.log_date === today)
@@ -71,10 +99,6 @@ export default async function OgrenciDashboardPage({
     (sum, l) => sum + l.correct_count + l.wrong_count + l.blank_count,
     0,
   );
-  const weekCorrect = (weekLogs ?? []).reduce((sum, l) => sum + l.correct_count, 0);
-  const weekWrong = (weekLogs ?? []).reduce((sum, l) => sum + l.wrong_count, 0);
-  const weekAccuracy =
-    weekCorrect + weekWrong > 0 ? Math.round((weekCorrect / (weekCorrect + weekWrong)) * 100) : null;
 
   const examDate = (examDateSetting?.value as string | null) ?? null;
   const remainingDays = examDate ? daysUntil(examDate) : null;
@@ -83,6 +107,27 @@ export default async function OgrenciDashboardPage({
   const longestStreak = computeLongestStreak(logDateList);
   const totalSolvedAllTime = Object.values(dailyActivity).reduce((sum, v) => sum + v, 0);
   const badges = getBadges(totalSolvedAllTime, longestStreak);
+  const taskList = (openTasks ?? []) as Task[];
+
+  const examList = (mockExams ?? []) as MockExam[];
+  const netChartData = examList.map((e) => ({
+    label: new Date(e.exam_date).toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit" }),
+    net: e.total_net,
+  }));
+  const latestTytNet = [...examList].reverse().find((e) => e.exam_type === "TYT")?.total_net ?? null;
+  const latestAytNet = [...examList].reverse().find((e) => e.exam_type === "AYT")?.total_net ?? null;
+  const latestExam = examList.length > 0 ? examList[examList.length - 1] : null;
+
+  const weekDayLabels = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
+  const weeklyChartData = weekDayLabels.map((label, i) => {
+    const date = new Date(weekStart + "T00:00:00");
+    date.setDate(date.getDate() + i);
+    const key = date.toISOString().slice(0, 10);
+    return { label, count: dailyActivity[key] ?? 0 };
+  });
+
+  const dailyGoal = profile.daily_question_goal;
+  const dailyGoalPct = dailyGoal ? Math.max(0, Math.min(100, Math.round((todayTotal / dailyGoal) * 100))) : null;
 
   type RecentLog = {
     id: string;
@@ -126,40 +171,196 @@ export default async function OgrenciDashboardPage({
         <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="flex items-center gap-4 pt-5">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-blue-500 text-white shadow-sm">
-              <ClipboardList className="h-5 w-5" />
+              <BarChart3 className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-sm text-slate-500">Bugün Çözülen</p>
-              <p className="text-3xl font-bold text-slate-900">{todayTotal}</p>
+              <p className="text-sm text-slate-500">Güncel TYT Net</p>
+              <p className="text-3xl font-bold text-slate-900">{latestTytNet ?? "—"}</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex items-center gap-4 pt-5">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-sm">
-              <TrendingUp className="h-5 w-5" />
+              <BarChart3 className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-sm text-slate-500">Bu Hafta Çözülen</p>
-              <p className="text-3xl font-bold text-slate-900">{weekTotal}</p>
+              <p className="text-sm text-slate-500">Güncel AYT Net</p>
+              <p className="text-3xl font-bold text-slate-900">{latestAytNet ?? "—"}</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex items-center gap-4 pt-5">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-sm">
-              <Target className="h-5 w-5" />
+              <GraduationCap className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-sm text-slate-500">Haftalık Doğruluk</p>
-              <p className="text-3xl font-bold text-slate-900">
-                {weekAccuracy === null ? "—" : `%${weekAccuracy}`}
-              </p>
+              <p className="text-sm text-slate-500">Hedef Bölüm</p>
+              {profile.target_department ? (
+                <p className="text-lg font-bold text-slate-900">{profile.target_department}</p>
+              ) : (
+                <Link href="/panel/profil" className="text-sm font-medium text-indigo-600 hover:underline">
+                  Profilinden belirle
+                </Link>
+              )}
             </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-4 pt-5">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-sm">
+              <Trophy className="h-5 w-5" />
+            </span>
+            <div>
+              <p className="text-sm text-slate-500">Hedef Sıralama</p>
+              {profile.target_rank ? (
+                <p className="text-3xl font-bold text-slate-900">{profile.target_rank.toLocaleString("tr-TR")}</p>
+              ) : (
+                <Link href="/panel/profil" className="text-sm font-medium text-indigo-600 hover:underline">
+                  Profilinden belirle
+                </Link>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {dailyGoal !== null && dailyGoalPct !== null && (
+        <Card>
+          <CardContent className="space-y-2 pt-5">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium text-slate-900">Bugünkü Hedef</span>
+              <span className="text-slate-500">
+                {todayTotal} / {dailyGoal} soru · %{dailyGoalPct}
+              </span>
+            </div>
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+              <div
+                className={`h-full rounded-full transition-all ${dailyGoalPct >= 100 ? "bg-emerald-500" : "bg-indigo-500"}`}
+                style={{ width: `${dailyGoalPct}%` }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardContent className="pt-5">
+            <p className="text-sm text-slate-500">Bugün Çözülen</p>
+            <p className="text-2xl font-bold text-slate-900">{todayTotal}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5">
+            <p className="text-sm text-slate-500">Bu Hafta Çözülen</p>
+            <p className="text-2xl font-bold text-slate-900">{weekTotal}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5">
+            <p className="text-sm text-slate-500">Toplam Çözülen</p>
+            <p className="text-2xl font-bold text-slate-900">{totalSolvedAllTime}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5">
+            <p className="text-sm text-slate-500">Genel Başarı</p>
+            <p className="text-2xl font-bold text-slate-900">
+              {overallAccuracy === null ? "—" : `%${overallAccuracy}`}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckSquare className="h-4 w-4 text-amber-600" />
+              Bugünkü Görevler
+            </CardTitle>
+            <CardDescription>Koçunun sana atadığı, henüz tamamlanmamış görevler.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {taskList.length === 0 ? (
+              <p className="text-sm text-slate-500">Bekleyen görevin yok, harika gidiyorsun!</p>
+            ) : (
+              <ul className="divide-y divide-slate-100">
+                {taskList.map((task) => (
+                  <li key={task.id} className="flex items-start gap-3 py-2.5">
+                    <div className="pt-0.5">
+                      <TaskToggle taskId={task.id} initialDone={task.is_done} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-slate-900">{task.title}</p>
+                      {task.due_date && (
+                        <p className="text-xs text-slate-500">
+                          Son tarih: {new Date(task.due_date).toLocaleDateString("tr-TR")}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <Link
+              href="/panel/ogrenci/gorevler"
+              className="mt-3 inline-block text-sm font-medium text-indigo-600 hover:underline"
+            >
+              Tüm görevleri gör →
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Percent className="h-4 w-4 text-indigo-600" />
+              Son Deneme Sonucu
+            </CardTitle>
+            <CardDescription>En son girdiğin deneme.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {latestExam ? (
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-slate-900">{latestExam.exam_name}</p>
+                  <p className="text-sm text-slate-500">
+                    {latestExam.exam_type} · {new Date(latestExam.exam_date).toLocaleDateString("tr-TR")}
+                  </p>
+                </div>
+                <Badge variant="indigo">{latestExam.total_net} net</Badge>
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">Henüz deneme kaydı yok.</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="min-w-0">
+          <CardHeader>
+            <CardTitle>Haftalık Çalışma Grafiği</CardTitle>
+            <CardDescription>Bu haftanın günlük soru çözüm dağılımı.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <WeeklyStudyChart data={weeklyChartData} />
+          </CardContent>
+        </Card>
+        <Card className="min-w-0">
+          <CardHeader>
+            <CardTitle>Net Gelişimi</CardTitle>
+            <CardDescription>Zaman içindeki toplam net değişimin.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <NetTrendChart data={netChartData} />
           </CardContent>
         </Card>
       </div>

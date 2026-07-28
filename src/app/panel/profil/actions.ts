@@ -25,6 +25,9 @@ export async function updateProfile(formData: FormData) {
   const gradeLevel = String(formData.get("grade_level") ?? "") as GradeLevel | "";
   const birthDate = String(formData.get("birth_date") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
+  const targetDepartment = String(formData.get("target_department") ?? "").trim();
+  const targetRank = Number(formData.get("target_rank") ?? "");
+  const dailyQuestionGoal = Number(formData.get("daily_question_goal") ?? "");
   const avatarFile = formData.get("avatar") as File | null;
 
   const updates: Record<string, unknown> = {
@@ -34,6 +37,9 @@ export async function updateProfile(formData: FormData) {
     grade_level: gradeLevel || null,
     birth_date: birthDate || null,
     bio: bio || null,
+    target_department: targetDepartment || null,
+    target_rank: targetRank > 0 ? targetRank : null,
+    daily_question_goal: dailyQuestionGoal > 0 ? dailyQuestionGoal : null,
   };
 
   if (avatarFile && avatarFile.size > 0) {
