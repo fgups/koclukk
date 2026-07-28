@@ -68,3 +68,41 @@ export async function getTopicStats(
       };
     });
 }
+
+/** Öğrencinin gün bazlı toplam çözdüğü soru sayısı (heatmap için). */
+export async function getDailyActivity(
+  supabase: SupabaseClient,
+  studentId: string,
+): Promise<Record<string, number>> {
+  const { data } = await supabase
+    .from("question_logs")
+    .select("log_date, correct_count, wrong_count, blank_count")
+    .eq("student_id", studentId);
+
+  const byDate: Record<string, number> = {};
+  for (const log of (data ?? []) as {
+    log_date: string;
+    correct_count: number;
+    wrong_count: number;
+    blank_count: number;
+  }[]) {
+    byDate[log.log_date] =
+      (byDate[log.log_date] ?? 0) + log.correct_count + log.wrong_count + log.blank_count;
+  }
+  return byDate;
+}
+
+/** En son ne zaman soru kaydı eklendiğini (varsa) döner. */
+export async function getLastActivityDate(
+  supabase: SupabaseClient,
+  studentId: string,
+): Promise<string | null> {
+  const { data } = await supabase
+    .from("question_logs")
+    .select("log_date")
+    .eq("student_id", studentId)
+    .order("log_date", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data?.log_date ?? null;
+}

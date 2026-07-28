@@ -1,10 +1,14 @@
 import Link from "next/link";
-import { ClipboardList, Flame, Sparkles, Target, TrendingUp } from "lucide-react";
+import { Award, CalendarDays, ClipboardList, Flame, Sparkles, Target, TrendingUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
+import { getDailyActivity } from "@/lib/stats";
+import { computeCurrentStreak, computeLongestStreak, getBadges } from "@/lib/gamification";
 import { QuestionLogForm } from "./log-form";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { BadgeList } from "@/components/gamification/badge-list";
+import { StudyHeatmap } from "@/components/progress/study-heatmap";
 
 function startOfWeekISO(): string {
   const now = new Date();
@@ -20,26 +24,6 @@ function daysUntil(dateStr: string): number {
   return Math.ceil((target.getTime() - today.getTime()) / 86400000);
 }
 
-function computeStreak(logDates: string[]): number {
-  const uniqueDates = [...new Set(logDates)].sort().reverse();
-  if (uniqueDates.length === 0) return 0;
-
-  const today = new Date(new Date().toDateString());
-  const mostRecent = new Date(uniqueDates[0] + "T00:00:00");
-  const gapFromToday = Math.round((today.getTime() - mostRecent.getTime()) / 86400000);
-  if (gapFromToday > 1) return 0;
-
-  let streak = 1;
-  for (let i = 1; i < uniqueDates.length; i++) {
-    const prev = new Date(uniqueDates[i - 1] + "T00:00:00");
-    const cur = new Date(uniqueDates[i] + "T00:00:00");
-    const diff = Math.round((prev.getTime() - cur.getTime()) / 86400000);
-    if (diff === 1) streak++;
-    else break;
-  }
-  return streak;
-}
-
 export default async function OgrenciDashboardPage({
   searchParams,
 }: {
@@ -49,20 +33,27 @@ export default async function OgrenciDashboardPage({
   const profile = await requireProfile();
   const supabase = await createClient();
 
-  const [{ data: subjects }, { data: topics }, { data: recentLogs }, { data: examDateSetting }, { data: allLogDates }] =
-    await Promise.all([
-      supabase.from("subjects").select("id, name, exam_type").order("exam_type").order("name"),
-      supabase.from("topics").select("id, name, subject_id").order("order_index"),
-      supabase
-        .from("question_logs")
-        .select("id, log_date, correct_count, wrong_count, blank_count, topics(name, subjects(name))")
-        .eq("student_id", profile.id)
-        .order("log_date", { ascending: false })
-        .order("created_at", { ascending: false })
-        .limit(10),
-      supabase.from("app_settings").select("value").eq("key", "exam_date").maybeSingle(),
-      supabase.from("question_logs").select("log_date").eq("student_id", profile.id),
-    ]);
+  const [
+    { data: subjects },
+    { data: topics },
+    { data: recentLogs },
+    { data: examDateSetting },
+    { data: allLogDates },
+    dailyActivity,
+  ] = await Promise.all([
+    supabase.from("subjects").select("id, name, exam_type").order("exam_type").order("name"),
+    supabase.from("topics").select("id, name, subject_id").order("order_index"),
+    supabase
+      .from("question_logs")
+      .select("id, log_date, correct_count, wrong_count, blank_count, topics(name, subjects(name))")
+      .eq("student_id", profile.id)
+      .order("log_date", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(10),
+    supabase.from("app_settings").select("value").eq("key", "exam_date").maybeSingle(),
+    supabase.from("question_logs").select("log_date").eq("student_id", profile.id),
+    getDailyActivity(supabase, profile.id),
+  ]);
 
   const weekStart = startOfWeekISO();
   const today = new Date().toISOString().slice(0, 10);
@@ -87,7 +78,11 @@ export default async function OgrenciDashboardPage({
 
   const examDate = (examDateSetting?.value as string | null) ?? null;
   const remainingDays = examDate ? daysUntil(examDate) : null;
-  const streak = computeStreak(((allLogDates ?? []) as { log_date: string }[]).map((l) => l.log_date));
+  const logDateList = ((allLogDates ?? []) as { log_date: string }[]).map((l) => l.log_date);
+  const streak = computeCurrentStreak(logDateList);
+  const longestStreak = computeLongestStreak(logDateList);
+  const totalSolvedAllTime = Object.values(dailyActivity).reduce((sum, v) => sum + v, 0);
+  const badges = getBadges(totalSolvedAllTime, longestStreak);
 
   type RecentLog = {
     id: string;
@@ -207,6 +202,34 @@ export default async function OgrenciDashboardPage({
                 ))}
               </ul>
             )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Award className="h-4 w-4 text-amber-500" />
+              Rozetlerim
+            </CardTitle>
+            <CardDescription>Çalışma alışkanlığını rozetlerle takip et.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <BadgeList badges={badges} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-emerald-600" />
+              Çalışma Takvimi
+            </CardTitle>
+            <CardDescription>Son {14 * 7} günün soru çözüm yoğunluğu.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <StudyHeatmap data={dailyActivity} />
           </CardContent>
         </Card>
       </div>

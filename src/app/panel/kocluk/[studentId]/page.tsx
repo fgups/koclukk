@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
+import { AlertTriangle, CalendarDays } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
-import { getTopicStats } from "@/lib/stats";
+import { getTopicStats, getDailyActivity, getLastActivityDate } from "@/lib/stats";
 import { addCoachNote, assignTask } from "./actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,8 +13,17 @@ import { NetTrendChart } from "@/components/charts/net-trend-chart";
 import { TaskToggle } from "@/components/tasks/task-toggle";
 import { TopicProgressView } from "@/components/progress/topic-progress-view";
 import { MockExamList } from "@/components/progress/mock-exam-list";
+import { StudyHeatmap } from "@/components/progress/study-heatmap";
 import { TRACK_LABELS, GRADE_LEVEL_LABELS } from "@/lib/types";
 import type { CoachNote, Message, MockExam, Profile, Task } from "@/lib/types";
+
+const INACTIVITY_WARNING_DAYS = 3;
+
+function daysSince(dateStr: string): number {
+  const then = new Date(dateStr + "T00:00:00");
+  const today = new Date(new Date().toDateString());
+  return Math.round((today.getTime() - then.getTime()) / 86400000);
+}
 
 type RecentLog = {
   id: string;
@@ -44,32 +54,44 @@ export default async function OgrenciDetayPage({
 
   if (!student) notFound();
 
-  const [stats, { data: notes }, { data: messages }, { data: mockExams }, { data: tasks }, { data: recentLogs }] =
-    await Promise.all([
-      getTopicStats(supabase, studentId),
-      supabase
-        .from("coach_notes")
-        .select("*")
-        .eq("student_id", studentId)
-        .order("created_at", { ascending: false }),
-      viewer.role === "coach"
-        ? supabase
-            .from("messages")
-            .select("*")
-            .eq("coach_id", viewer.id)
-            .eq("student_id", studentId)
-            .order("created_at")
-        : Promise.resolve({ data: null }),
-      supabase.from("mock_exams").select("*").eq("student_id", studentId).order("exam_date"),
-      supabase.from("tasks").select("*").eq("student_id", studentId).order("created_at", { ascending: false }),
-      supabase
-        .from("question_logs")
-        .select("id, log_date, correct_count, wrong_count, blank_count, topics(name, subjects(name))")
-        .eq("student_id", studentId)
-        .order("log_date", { ascending: false })
-        .order("created_at", { ascending: false })
-        .limit(15),
-    ]);
+  const [
+    stats,
+    { data: notes },
+    { data: messages },
+    { data: mockExams },
+    { data: tasks },
+    { data: recentLogs },
+    dailyActivity,
+    lastActivity,
+  ] = await Promise.all([
+    getTopicStats(supabase, studentId),
+    supabase
+      .from("coach_notes")
+      .select("*")
+      .eq("student_id", studentId)
+      .order("created_at", { ascending: false }),
+    viewer.role === "coach"
+      ? supabase
+          .from("messages")
+          .select("*")
+          .eq("coach_id", viewer.id)
+          .eq("student_id", studentId)
+          .order("created_at")
+      : Promise.resolve({ data: null }),
+    supabase.from("mock_exams").select("*").eq("student_id", studentId).order("exam_date"),
+    supabase.from("tasks").select("*").eq("student_id", studentId).order("created_at", { ascending: false }),
+    supabase
+      .from("question_logs")
+      .select("id, log_date, correct_count, wrong_count, blank_count, topics(name, subjects(name))")
+      .eq("student_id", studentId)
+      .order("log_date", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(15),
+    getDailyActivity(supabase, studentId),
+    getLastActivityDate(supabase, studentId),
+  ]);
+
+  const inactiveDays = lastActivity ? daysSince(lastActivity) : null;
 
   const weakTopics = [...stats]
     .filter((t) => t.total > 0)
@@ -117,8 +139,27 @@ export default async function OgrenciDetayPage({
             {s.phone && <span>📞 {s.phone}</span>}
           </p>
           {s.bio && <p className="mt-2 max-w-xl text-sm text-slate-600">{s.bio}</p>}
+          {inactiveDays !== null && inactiveDays >= INACTIVITY_WARNING_DAYS && (
+            <div className="mt-2 flex w-fit items-center gap-1.5 rounded-lg bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+              {inactiveDays} gündür çalışmıyor
+            </div>
+          )}
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarDays className="h-4 w-4 text-emerald-600" />
+            Çalışma Takvimi
+          </CardTitle>
+          <CardDescription>Son {14 * 7} günün soru çözüm yoğunluğu.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <StudyHeatmap data={dailyActivity} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
