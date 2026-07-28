@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { TopicStat } from "@/lib/types";
+import type { GoalProgress, SubjectNet, TopicStat } from "@/lib/types";
 
 /**
  * Tüm müfredat konularını, verilen öğrencinin soru kayıtlarıyla birleştirip
@@ -90,6 +90,48 @@ export async function getDailyActivity(
       (byDate[log.log_date] ?? 0) + log.correct_count + log.wrong_count + log.blank_count;
   }
   return byDate;
+}
+
+/** Öğrencinin ders bazlı net hedeflerini, en güncel deneme netleriyle birlikte döner. */
+export async function getGoalProgress(
+  supabase: SupabaseClient,
+  studentId: string,
+): Promise<GoalProgress[]> {
+  const [{ data: goals }, { data: subjects }, { data: exams }] = await Promise.all([
+    supabase.from("student_goals").select("subject_id, target_net").eq("student_id", studentId),
+    supabase.from("subjects").select("id, name, exam_type"),
+    supabase
+      .from("mock_exams")
+      .select("subject_nets")
+      .eq("student_id", studentId)
+      .order("exam_date", { ascending: false }),
+  ]);
+
+  type GoalRow = { subject_id: string; target_net: number };
+  type SubjectRow = { id: string; name: string; exam_type: "TYT" | "AYT" };
+
+  const subjectById = new Map<string, SubjectRow>();
+  for (const s of (subjects ?? []) as SubjectRow[]) subjectById.set(s.id, s);
+
+  const latestNetByName = new Map<string, number>();
+  for (const exam of (exams ?? []) as { subject_nets: SubjectNet[] }[]) {
+    for (const s of exam.subject_nets) {
+      if (!latestNetByName.has(s.subject_name)) latestNetByName.set(s.subject_name, s.net);
+    }
+  }
+
+  return ((goals ?? []) as GoalRow[])
+    .map((g) => {
+      const subject = subjectById.get(g.subject_id);
+      return {
+        subject_id: g.subject_id,
+        subject_name: subject?.name ?? "Bilinmeyen ders",
+        exam_type: subject?.exam_type ?? "TYT",
+        target_net: g.target_net,
+        current_net: subject ? (latestNetByName.get(subject.name) ?? null) : null,
+      };
+    })
+    .sort((a, b) => a.exam_type.localeCompare(b.exam_type) || a.subject_name.localeCompare(b.subject_name, "tr"));
 }
 
 /** En son ne zaman soru kaydı eklendiğini (varsa) döner. */

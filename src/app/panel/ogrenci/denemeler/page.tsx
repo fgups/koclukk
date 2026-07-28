@@ -1,11 +1,14 @@
-import { Target } from "lucide-react";
+import { Flag, Target } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
+import { getGoalProgress } from "@/lib/stats";
 import { MockExamForm } from "./mock-exam-form";
+import { GoalsForm } from "./goals-form";
 import { NetTrendChart } from "@/components/charts/net-trend-chart";
 import { MockExamList } from "@/components/progress/mock-exam-list";
+import { GoalProgressList } from "@/components/progress/goal-progress-list";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import type { MockExam, Subject } from "@/lib/types";
+import type { MockExam, StudentGoal, Subject } from "@/lib/types";
 
 export default async function DenemelerPage({
   searchParams,
@@ -16,13 +19,15 @@ export default async function DenemelerPage({
   const profile = await requireProfile();
   const supabase = await createClient();
 
-  const [{ data: subjects }, { data: exams }] = await Promise.all([
+  const [{ data: subjects }, { data: exams }, { data: goals }, goalProgress] = await Promise.all([
     supabase.from("subjects").select("id, name, exam_type").order("exam_type").order("name"),
     supabase
       .from("mock_exams")
       .select("*")
       .eq("student_id", profile.id)
       .order("exam_date"),
+    supabase.from("student_goals").select("*").eq("student_id", profile.id),
+    getGoalProgress(supabase, profile.id),
   ]);
 
   const mockExams = (exams ?? []) as MockExam[];
@@ -30,6 +35,9 @@ export default async function DenemelerPage({
     label: new Date(e.exam_date).toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit" }),
     net: e.total_net,
   }));
+  const goalsBySubject = Object.fromEntries(
+    ((goals ?? []) as StudentGoal[]).map((g) => [g.subject_id, g.target_net]),
+  );
 
   return (
     <div className="space-y-8">
@@ -44,7 +52,9 @@ export default async function DenemelerPage({
       </div>
 
       {success && (
-        <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">Deneme kaydedildi.</p>
+        <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          {success === "goals" ? "Hedeflerin kaydedildi." : "Deneme kaydedildi."}
+        </p>
       )}
       {error && <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
 
@@ -79,6 +89,31 @@ export default async function DenemelerPage({
           <MockExamList exams={mockExams} />
         </CardContent>
       </Card>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Flag className="h-4 w-4 text-indigo-600" />
+              Ders Bazlı Net Hedeflerim
+            </CardTitle>
+            <CardDescription>Her ders için ulaşmak istediğin net sayısını belirle.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <GoalsForm subjects={(subjects ?? []) as Subject[]} goalsBySubject={goalsBySubject} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Hedef İlerlemem</CardTitle>
+            <CardDescription>En güncel deneme netine göre hedeflerine ne kadar yaklaştın.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <GoalProgressList goals={goalProgress} />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

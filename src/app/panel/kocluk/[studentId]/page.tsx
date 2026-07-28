@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { AlertTriangle, CalendarDays } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
-import { getTopicStats, getDailyActivity, getLastActivityDate } from "@/lib/stats";
+import { getTopicStats, getDailyActivity, getLastActivityDate, getGoalProgress } from "@/lib/stats";
 import { addCoachNote, assignTask } from "./actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import { TaskToggle } from "@/components/tasks/task-toggle";
 import { TopicProgressView } from "@/components/progress/topic-progress-view";
 import { MockExamList } from "@/components/progress/mock-exam-list";
 import { StudyHeatmap } from "@/components/progress/study-heatmap";
+import { GoalProgressList } from "@/components/progress/goal-progress-list";
 import { TRACK_LABELS, GRADE_LEVEL_LABELS } from "@/lib/types";
 import type { CoachNote, Message, MockExam, Profile, Task } from "@/lib/types";
 
@@ -63,6 +64,7 @@ export default async function OgrenciDetayPage({
     { data: recentLogs },
     dailyActivity,
     lastActivity,
+    goalProgress,
   ] = await Promise.all([
     getTopicStats(supabase, studentId),
     supabase
@@ -89,6 +91,7 @@ export default async function OgrenciDetayPage({
       .limit(15),
     getDailyActivity(supabase, studentId),
     getLastActivityDate(supabase, studentId),
+    getGoalProgress(supabase, studentId),
   ]);
 
   const inactiveDays = lastActivity ? daysSince(lastActivity) : null;
@@ -259,6 +262,16 @@ export default async function OgrenciDetayPage({
         <CardContent className="space-y-5">
           <NetTrendChart data={netChartData} />
           <MockExamList exams={examList} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Net Hedefleri</CardTitle>
+          <CardDescription>Öğrencinin kendi belirlediği ders bazlı hedeflere göre ilerlemesi.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <GoalProgressList goals={goalProgress} />
         </CardContent>
       </Card>
 

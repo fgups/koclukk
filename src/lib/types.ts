@@ -113,6 +113,23 @@ export interface Task {
   created_at: string;
 }
 
+export interface StudentGoal {
+  id: string;
+  student_id: string;
+  subject_id: string;
+  target_net: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GoalProgress {
+  subject_id: string;
+  subject_name: string;
+  exam_type: ExamType;
+  target_net: number;
+  current_net: number | null;
+}
+
 export interface TopicStat {
   topic_id: string;
   topic_name: string;

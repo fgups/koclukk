@@ -47,5 +47,43 @@ export async function addMockExam(formData: FormData) {
   }
 
   revalidatePath("/panel/ogrenci/denemeler");
-  redirect("/panel/ogrenci/denemeler?success=1");
+  redirect("/panel/ogrenci/denemeler?success=exam");
+}
+
+export async function setGoals(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
+  if (!user) redirect("/giris");
+
+  const toUpsert: { student_id: string; subject_id: string; target_net: number }[] = [];
+  const toDelete: string[] = [];
+
+  for (const [key, value] of formData.entries()) {
+    if (!key.startsWith("target_")) continue;
+    const subjectId = key.slice("target_".length);
+    const num = Number(value);
+    if (value !== "" && !Number.isNaN(num) && num > 0) {
+      toUpsert.push({ student_id: user.id, subject_id: subjectId, target_net: Math.round(num * 100) / 100 });
+    } else {
+      toDelete.push(subjectId);
+    }
+  }
+
+  if (toUpsert.length > 0) {
+    const { error } = await supabase
+      .from("student_goals")
+      .upsert(toUpsert, { onConflict: "student_id,subject_id" });
+    if (error) {
+      redirect("/panel/ogrenci/denemeler?error=" + encodeURIComponent(error.message));
+    }
+  }
+  if (toDelete.length > 0) {
+    await supabase.from("student_goals").delete().eq("student_id", user.id).in("subject_id", toDelete);
+  }
+
+  revalidatePath("/panel/ogrenci/denemeler");
+  redirect("/panel/ogrenci/denemeler?success=goals");
 }
