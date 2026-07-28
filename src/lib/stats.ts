@@ -134,6 +134,19 @@ export async function getGoalProgress(
     .sort((a, b) => a.exam_type.localeCompare(b.exam_type) || a.subject_name.localeCompare(b.subject_name, "tr"));
 }
 
+/** Son iki deneme arasındaki net farkını döner (yeterli deneme yoksa null). */
+export async function getNetTrend(supabase: SupabaseClient, studentId: string): Promise<number | null> {
+  const { data } = await supabase
+    .from("mock_exams")
+    .select("total_net")
+    .eq("student_id", studentId)
+    .order("exam_date", { ascending: false })
+    .limit(2);
+
+  if (!data || data.length < 2) return null;
+  return Math.round((data[0].total_net - data[1].total_net) * 100) / 100;
+}
+
 /** En son ne zaman soru kaydı eklendiğini (varsa) döner. */
 export async function getLastActivityDate(
   supabase: SupabaseClient,

@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AlertTriangle, Users2 } from "lucide-react";
+import { Users2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
-import { getTopicStats, getLastActivityDate } from "@/lib/stats";
+import { getTopicStats, getLastActivityDate, getNetTrend } from "@/lib/stats";
+import { assessRisk } from "@/lib/risk";
+import { RiskBadge } from "@/components/risk-badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TRACK_LABELS } from "@/lib/types";
 import type { Profile } from "@/lib/types";
-
-const INACTIVITY_WARNING_DAYS = 3;
 
 function daysSince(dateStr: string): number {
   const then = new Date(dateStr + "T00:00:00");
@@ -37,9 +37,10 @@ export default async function KocPanelPage() {
 
   const summaries = await Promise.all(
     students.map(async (student) => {
-      const [stats, lastActivity] = await Promise.all([
+      const [stats, lastActivity, netTrend] = await Promise.all([
         getTopicStats(supabase, student.id),
         getLastActivityDate(supabase, student.id),
+        getNetTrend(supabase, student.id),
       ]);
       const total = stats.reduce((sum, t) => sum + t.total, 0);
       const correct = stats.reduce((sum, t) => sum + t.correct, 0);
@@ -49,7 +50,8 @@ export default async function KocPanelPage() {
         .filter((t) => t.total > 0)
         .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
       const inactiveDays = lastActivity ? daysSince(lastActivity) : null;
-      return { student, total, accuracy, weakest, inactiveDays };
+      const risk = assessRisk(inactiveDays, netTrend);
+      return { student, total, accuracy, weakest, risk };
     }),
   );
 
@@ -75,7 +77,7 @@ export default async function KocPanelPage() {
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {summaries.map(({ student, total, accuracy, weakest, inactiveDays }) => (
+          {summaries.map(({ student, total, accuracy, weakest, risk }) => (
             <Link key={student.id} href={`/panel/kocluk/${student.id}`}>
               <Card className="h-full transition-shadow hover:shadow-md">
                 <CardHeader className="flex-row items-center gap-3 space-y-0">
@@ -120,12 +122,7 @@ export default async function KocPanelPage() {
                       <Badge variant="warning">En zayıf: {weakest.topic_name}</Badge>
                     </div>
                   )}
-                  {inactiveDays !== null && inactiveDays >= INACTIVITY_WARNING_DAYS && (
-                    <div className="flex items-center gap-1.5 rounded-lg bg-red-50 px-2 py-1.5 text-xs font-medium text-red-700">
-                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                      {inactiveDays} gündür çalışmıyor
-                    </div>
-                  )}
+                  <RiskBadge risk={risk} />
                 </CardContent>
               </Card>
             </Link>

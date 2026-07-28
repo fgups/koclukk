@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
-import { AlertTriangle, CalendarDays } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { getTopicStats, getDailyActivity, getLastActivityDate, getGoalProgress } from "@/lib/stats";
+import { assessRisk } from "@/lib/risk";
 import { addCoachNote, assignTask } from "./actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,10 +16,9 @@ import { TopicProgressView } from "@/components/progress/topic-progress-view";
 import { MockExamList } from "@/components/progress/mock-exam-list";
 import { StudyHeatmap } from "@/components/progress/study-heatmap";
 import { GoalProgressList } from "@/components/progress/goal-progress-list";
+import { RiskBadge } from "@/components/risk-badge";
 import { TRACK_LABELS, GRADE_LEVEL_LABELS } from "@/lib/types";
 import type { CoachNote, Message, MockExam, Profile, Task } from "@/lib/types";
-
-const INACTIVITY_WARNING_DAYS = 3;
 
 function daysSince(dateStr: string): number {
   const then = new Date(dateStr + "T00:00:00");
@@ -108,6 +108,11 @@ export default async function OgrenciDetayPage({
     label: new Date(e.exam_date).toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit" }),
     net: e.total_net,
   }));
+  const netTrend =
+    examList.length >= 2
+      ? Math.round((examList[examList.length - 1].total_net - examList[examList.length - 2].total_net) * 100) / 100
+      : null;
+  const risk = assessRisk(inactiveDays, netTrend);
   const taskList = (tasks ?? []) as Task[];
 
   const s = student as Profile;
@@ -142,12 +147,9 @@ export default async function OgrenciDetayPage({
             {s.phone && <span>📞 {s.phone}</span>}
           </p>
           {s.bio && <p className="mt-2 max-w-xl text-sm text-slate-600">{s.bio}</p>}
-          {inactiveDays !== null && inactiveDays >= INACTIVITY_WARNING_DAYS && (
-            <div className="mt-2 flex w-fit items-center gap-1.5 rounded-lg bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700">
-              <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-              {inactiveDays} gündür çalışmıyor
-            </div>
-          )}
+          <div className="mt-2 w-fit">
+            <RiskBadge risk={risk} />
+          </div>
         </div>
       </div>
 
