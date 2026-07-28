@@ -3,8 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { MockExamForm } from "./mock-exam-form";
 import { NetTrendChart } from "@/components/charts/net-trend-chart";
+import { MockExamList } from "@/components/progress/mock-exam-list";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import type { MockExam, Subject } from "@/lib/types";
 
 export default async function DenemelerPage({
@@ -73,25 +73,10 @@ export default async function DenemelerPage({
       <Card>
         <CardHeader>
           <CardTitle>Geçmiş Denemeler</CardTitle>
+          <CardDescription>Ders bazlı net dökümü için bir denemeye tıkla.</CardDescription>
         </CardHeader>
         <CardContent>
-          {mockExams.length === 0 ? (
-            <p className="text-sm text-slate-500">Henüz deneme eklemedin.</p>
-          ) : (
-            <ul className="divide-y divide-slate-100">
-              {[...mockExams].reverse().map((exam) => (
-                <li key={exam.id} className="flex items-center justify-between py-3 text-sm">
-                  <div>
-                    <p className="font-medium text-slate-900">{exam.exam_name}</p>
-                    <p className="text-slate-500">
-                      {exam.exam_type} · {new Date(exam.exam_date).toLocaleDateString("tr-TR")}
-                    </p>
-                  </div>
-                  <Badge variant="indigo">{exam.total_net} net</Badge>
-                </li>
-              ))}
-            </ul>
-          )}
+          <MockExamList exams={mockExams} />
         </CardContent>
       </Card>
     </div>

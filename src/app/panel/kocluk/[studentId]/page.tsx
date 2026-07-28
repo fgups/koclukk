@@ -11,6 +11,7 @@ import { MessageThread } from "@/components/chat/message-thread";
 import { NetTrendChart } from "@/components/charts/net-trend-chart";
 import { TaskToggle } from "@/components/tasks/task-toggle";
 import { TopicProgressView } from "@/components/progress/topic-progress-view";
+import { MockExamList } from "@/components/progress/mock-exam-list";
 import { TRACK_LABELS, GRADE_LEVEL_LABELS } from "@/lib/types";
 import type { CoachNote, Message, MockExam, Profile, Task } from "@/lib/types";
 
@@ -212,10 +213,11 @@ export default async function OgrenciDetayPage({
       <Card>
         <CardHeader>
           <CardTitle>Deneme Sonuçları</CardTitle>
-          <CardDescription>Öğrencinin net gelişimi.</CardDescription>
+          <CardDescription>Öğrencinin net gelişimi ve ders bazlı dökümü.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-5">
           <NetTrendChart data={netChartData} />
+          <MockExamList exams={examList} />
         </CardContent>
       </Card>
 
