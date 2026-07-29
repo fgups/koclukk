@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { PanelNav } from "@/components/panel-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationBell } from "@/components/notification-bell";
+import { getNotifications } from "@/lib/notifications";
 import { TRACK_LABELS } from "@/lib/types";
 
 const NAV_BY_ROLE = {
@@ -33,12 +35,15 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   const nav = NAV_BY_ROLE[profile.role];
 
   const supabase = await createClient();
-  const { count: unreadCount } = await supabase
-    .from("messages")
-    .select("id", { count: "exact", head: true })
-    .or(`coach_id.eq.${profile.id},student_id.eq.${profile.id}`)
-    .neq("sender_id", profile.id)
-    .is("read_at", null);
+  const [{ count: unreadCount }, notifications] = await Promise.all([
+    supabase
+      .from("messages")
+      .select("id", { count: "exact", head: true })
+      .or(`coach_id.eq.${profile.id},student_id.eq.${profile.id}`)
+      .neq("sender_id", profile.id)
+      .is("read_at", null),
+    getNotifications(supabase, profile),
+  ]);
 
   const badges: Record<string, number> | undefined =
     profile.role === "student"
@@ -92,6 +97,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
                 {initials}
               </span>
             )}
+            <NotificationBell items={notifications} />
             <ThemeToggle />
             <form action={signOut}>
               <Button variant="outline" size="sm" type="submit">
