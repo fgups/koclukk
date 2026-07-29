@@ -9,7 +9,7 @@ function levelFor(count: number): number {
 }
 
 const LEVEL_CLASSES = [
-  "bg-slate-100",
+  "bg-slate-100 dark:bg-slate-800",
   "bg-emerald-200",
   "bg-emerald-400",
   "bg-emerald-600",
@@ -38,7 +38,7 @@ export function StudyHeatmap({ data, weeks = 14 }: { data: Record<string, number
   return (
     <div>
       <div className="flex gap-2 overflow-x-auto pb-2">
-        <div className="flex flex-col gap-1 pt-0 text-[10px] text-slate-400">
+        <div className="flex flex-col gap-1 pt-0 text-[10px] text-slate-400 dark:text-slate-500">
           {DAY_LABELS.map((d) => (
             <span key={d} className="flex h-3.5 items-center">
               {d}
@@ -57,7 +57,7 @@ export function StudyHeatmap({ data, weeks = 14 }: { data: Record<string, number
           </div>
         ))}
       </div>
-      <div className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-400">
+      <div className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-400 dark:text-slate-500">
         <span>Az</span>
         {LEVEL_CLASSES.map((c, i) => (
           <span key={i} className={`h-3 w-3 rounded-sm ${c}`} />

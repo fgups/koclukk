@@ -86,9 +86,9 @@ export function MessageThread({
 
   return (
     <div className="flex h-[420px] flex-col">
-      <div className="flex-1 space-y-3 overflow-y-auto rounded-lg bg-slate-50 p-4">
+      <div className="flex-1 space-y-3 overflow-y-auto rounded-lg bg-slate-50 dark:bg-slate-900 p-4">
         {messages.length === 0 && (
-          <p className="text-center text-sm text-slate-500">Henüz mesaj yok. İlk mesajı sen gönder.</p>
+          <p className="text-center text-sm text-slate-500 dark:text-slate-400">Henüz mesaj yok. İlk mesajı sen gönder.</p>
         )}
         {messages.map((m) => {
           const isMine = m.sender_id === currentUserId;
@@ -96,11 +96,11 @@ export function MessageThread({
             <div key={m.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
               <div
                 className={`max-w-[75%] rounded-2xl px-3.5 py-2 text-sm ${
-                  isMine ? "bg-indigo-600 text-white" : "bg-white text-slate-800 shadow-sm"
+                  isMine ? "bg-indigo-600 text-white" : "bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 shadow-sm"
                 }`}
               >
                 <p className="whitespace-pre-line">{m.body}</p>
-                <p className={`mt-1 text-[10px] ${isMine ? "text-indigo-100" : "text-slate-400"}`}>
+                <p className={`mt-1 text-[10px] ${isMine ? "text-indigo-100" : "text-slate-400 dark:text-slate-500"}`}>
                   {new Date(m.created_at).toLocaleString("tr-TR", { hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>

@@ -51,8 +51,8 @@ export function MockExamForm({ subjects }: { subjects: Subject[] }) {
       </div>
 
       {relevantSubjects.length > 0 && (
-        <div className="space-y-2 rounded-lg bg-slate-50 p-3">
-          <div className="grid grid-cols-[1fr_80px_80px] gap-2 text-xs font-medium text-slate-500">
+        <div className="space-y-2 rounded-lg bg-slate-50 dark:bg-slate-900 p-3">
+          <div className="grid grid-cols-[1fr_80px_80px] gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
             <span>Ders</span>
             <span>Doğru</span>
             <span>Yanlış</span>
@@ -60,7 +60,7 @@ export function MockExamForm({ subjects }: { subjects: Subject[] }) {
           {relevantSubjects.map((s) => (
             <div key={s.id} className="grid grid-cols-[1fr_80px_80px] items-center gap-2">
               <input type="hidden" name="subject_name" value={s.name} />
-              <span className="text-sm text-slate-700">{s.name}</span>
+              <span className="text-sm text-slate-700 dark:text-slate-300">{s.name}</span>
               <Input name="correct" type="number" min={0} defaultValue={0} className="h-9" />
               <Input name="wrong" type="number" min={0} defaultValue={0} className="h-9" />
             </div>

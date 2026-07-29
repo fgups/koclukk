@@ -21,11 +21,11 @@ export function GoalsForm({
         if (list.length === 0) return null;
         return (
           <div key={type} className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{type}</p>
-            <div className="space-y-2 rounded-lg bg-slate-50 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">{type}</p>
+            <div className="space-y-2 rounded-lg bg-slate-50 dark:bg-slate-900 p-3">
               {list.map((s) => (
                 <div key={s.id} className="grid grid-cols-[1fr_100px] items-center gap-2">
-                  <span className="text-sm text-slate-700">{s.name}</span>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">{s.name}</span>
                   <Input
                     name={`target_${s.id}`}
                     type="number"

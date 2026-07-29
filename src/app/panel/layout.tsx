@@ -4,6 +4,7 @@ import { signOut } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { PanelNav } from "@/components/panel-nav";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { TRACK_LABELS } from "@/lib/types";
 
 const NAV_BY_ROLE = {
@@ -54,11 +55,11 @@ export default async function PanelLayout({ children }: { children: React.ReactN
     .toUpperCase();
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur-sm">
+    <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
+      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/90">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <div className="flex items-center gap-8">
-            <Link href="/panel" className="flex items-center gap-2 text-lg font-bold text-slate-900">
+            <Link href="/panel" className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-slate-100">
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 text-sm text-white shadow-sm shadow-indigo-600/30">
                 AK
               </span>
@@ -68,8 +69,8 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden text-right sm:block">
-              <p className="text-sm font-medium text-slate-900">{profile.full_name || "Kullanıcı"}</p>
-              <p className="text-xs text-slate-500">
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{profile.full_name || "Kullanıcı"}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {profile.role === "student"
                   ? profile.track
                     ? TRACK_LABELS[profile.track]
@@ -84,13 +85,14 @@ export default async function PanelLayout({ children }: { children: React.ReactN
               <img
                 src={profile.avatar_url}
                 alt={profile.full_name}
-                className="h-9 w-9 rounded-full object-cover ring-2 ring-indigo-100"
+                className="h-9 w-9 rounded-full object-cover ring-2 ring-indigo-100 dark:ring-indigo-900"
               />
             ) : (
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-sm font-semibold text-white">
                 {initials}
               </span>
             )}
+            <ThemeToggle />
             <form action={signOut}>
               <Button variant="outline" size="sm" type="submit">
                 Çıkış
@@ -100,11 +102,11 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         </div>
         <PanelNav
           items={nav}
-          className="flex gap-1 overflow-x-auto border-t border-slate-100 px-4 py-2 sm:hidden"
+          className="flex gap-1 overflow-x-auto border-t border-slate-100 px-4 py-2 dark:border-slate-800 sm:hidden"
           badges={badges}
         />
       </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
+      <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 py-8">{children}</main>
     </div>
   );
 }

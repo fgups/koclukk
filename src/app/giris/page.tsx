@@ -18,8 +18,8 @@ export default async function GirisPage({
         <Link href="/" className="text-xl font-bold text-indigo-600 lg:hidden">
           Albatros Koçluk
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-900">Giriş Yap</h1>
-        <p className="mt-1 text-sm text-slate-500">Panelin için giriş yaparak devam et.</p>
+        <h1 className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">Giriş Yap</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Panelin için giriş yaparak devam et.</p>
       </div>
       <Card>
         <CardContent className="pt-5">
@@ -53,7 +53,7 @@ export default async function GirisPage({
           </form>
         </CardContent>
       </Card>
-      <p className="mt-4 text-center text-sm text-slate-500">
+      <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
         Hesabın yok mu?{" "}
         <Link href="/kayit" className="font-medium text-indigo-600 hover:underline">
           Kayıt ol

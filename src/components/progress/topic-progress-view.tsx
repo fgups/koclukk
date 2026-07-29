@@ -83,15 +83,15 @@ export function TopicProgressView({
             return (
               <details
                 key={`${group.subject_name}-${group.exam_type}`}
-                className="group rounded-lg border border-slate-200"
+                className="group rounded-lg border border-slate-200 dark:border-slate-800"
               >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50">
-                  <span className="font-medium text-slate-900">
+                  <span className="font-medium text-slate-900 dark:text-slate-100">
                     {group.subject_name}{" "}
-                    <span className="text-xs font-normal text-slate-400">({group.exam_type})</span>
+                    <span className="text-xs font-normal text-slate-400 dark:text-slate-500">({group.exam_type})</span>
                   </span>
                   <span className="flex shrink-0 items-center gap-3">
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
                       {started}/{group.topics.length} konu
                     </span>
                     {groupAccuracy !== null && (
@@ -99,13 +99,13 @@ export function TopicProgressView({
                         %{groupAccuracy}
                       </Badge>
                     )}
-                    <ChevronDown className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-180" />
+                    <ChevronDown className="h-4 w-4 text-slate-400 dark:text-slate-500 transition-transform group-open:rotate-180" />
                   </span>
                 </summary>
-                <div className="overflow-x-auto border-t border-slate-100 px-4 pb-3 pt-2">
+                <div className="overflow-x-auto border-t border-slate-100 dark:border-slate-800 px-4 pb-3 pt-2">
                   <table className="w-full text-left text-sm">
                     <thead>
-                      <tr className="border-b border-slate-100 text-slate-500">
+                      <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400">
                         <th className="pb-2 pr-4 font-medium">Konu</th>
                         <th className="pb-2 pr-4 font-medium">Doğru</th>
                         <th className="pb-2 pr-4 font-medium">Yanlış</th>
@@ -120,14 +120,14 @@ export function TopicProgressView({
                         const status = statusFor(t.total, t.accuracy);
                         return (
                           <tr key={t.topic_id} className="hover:bg-slate-50">
-                            <td className="py-2 pr-4 font-medium text-slate-900">{t.topic_name}</td>
+                            <td className="py-2 pr-4 font-medium text-slate-900 dark:text-slate-100">{t.topic_name}</td>
                             <td className="py-2 pr-4 text-emerald-700">{t.correct}</td>
                             <td className="py-2 pr-4 text-red-700">{t.wrong}</td>
-                            <td className="py-2 pr-4 text-slate-500">{t.blank}</td>
-                            <td className="py-2 pr-4 text-slate-700">
+                            <td className="py-2 pr-4 text-slate-500 dark:text-slate-400">{t.blank}</td>
+                            <td className="py-2 pr-4 text-slate-700 dark:text-slate-300">
                               {t.accuracy === null ? "—" : `%${Math.round(t.accuracy * 100)}`}
                             </td>
-                            <td className="py-2 pr-4 text-slate-500">{t.last_practiced ?? "—"}</td>
+                            <td className="py-2 pr-4 text-slate-500 dark:text-slate-400">{t.last_practiced ?? "—"}</td>
                             <td className="py-2">
                               <Badge variant={status.variant}>{status.label}</Badge>
                             </td>

@@ -34,8 +34,8 @@ export default async function AdminPage({
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Yönetim</h1>
-        <p className="mt-1 text-sm text-slate-500">Kullanıcı rolleri, koç-öğrenci atamaları ve sınav ayarları.</p>
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Yönetim</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Kullanıcı rolleri, koç-öğrenci atamaları ve sınav ayarları.</p>
       </div>
 
       {error && <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
@@ -51,7 +51,7 @@ export default async function AdminPage({
         <CardContent>
           <form action={setExamDate} className="flex flex-wrap items-end gap-3">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">YKS Sınav Tarihi</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">YKS Sınav Tarihi</label>
               <Input name="exam_date" type="date" defaultValue={currentExamDate} className="w-48" required />
             </div>
             <Button type="submit">Kaydet</Button>
@@ -71,13 +71,13 @@ export default async function AdminPage({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500">
+                <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">
                   <th className="pb-2 pr-4 font-medium">Kullanıcı</th>
                   <th className="pb-2 pr-4 font-medium">Rol</th>
                   <th className="pb-2 font-medium">İşlem</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {profiles.map((p) => {
                   const initials = (p.full_name || "?")
                     .trim()
@@ -102,7 +102,7 @@ export default async function AdminPage({
                               {initials}
                             </span>
                           )}
-                          <span className="font-medium text-slate-900">{p.full_name || "—"}</span>
+                          <span className="font-medium text-slate-900 dark:text-slate-100">{p.full_name || "—"}</span>
                         </div>
                       </td>
                       <td className="py-2 pr-4">
@@ -143,7 +143,7 @@ export default async function AdminPage({
         <CardContent className="space-y-6">
           <form action={assignStudent} className="flex flex-wrap items-end gap-3">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">Koç</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Koç</label>
               <Select name="coach_id" className="w-48" required>
                 <option value="" disabled defaultValue="">
                   Koç seç
@@ -156,7 +156,7 @@ export default async function AdminPage({
               </Select>
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">Öğrenci</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Öğrenci</label>
               <Select name="student_id" className="w-48" required>
                 <option value="" disabled defaultValue="">
                   Öğrenci seç
@@ -178,8 +178,8 @@ export default async function AdminPage({
               );
               if (assignedStudents.length === 0) return null;
               return (
-                <div key={coach.id} className="rounded-lg border border-slate-200 p-3">
-                  <p className="mb-2 text-sm font-medium text-slate-900">
+                <div key={coach.id} className="rounded-lg border border-slate-200 dark:border-slate-800 p-3">
+                  <p className="mb-2 text-sm font-medium text-slate-900 dark:text-slate-100">
                     {coach.full_name || coach.id.slice(0, 8)}
                   </p>
                   <div className="flex flex-wrap gap-2">

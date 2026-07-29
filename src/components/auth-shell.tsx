@@ -43,7 +43,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         <p className="text-sm text-indigo-200">© {new Date().getFullYear()} Albatros Koçluk</p>
       </div>
 
-      <div className="flex items-center justify-center bg-slate-50 px-4 py-12">
+      <div className="flex items-center justify-center bg-slate-50 px-4 py-12 dark:bg-slate-950">
         <div className="w-full max-w-sm">{children}</div>
       </div>
     </div>

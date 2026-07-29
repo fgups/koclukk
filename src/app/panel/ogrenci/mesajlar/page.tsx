@@ -21,14 +21,14 @@ export default async function OgrenciMesajlarPage() {
   if (coaches.length === 0) {
     return (
       <div className="space-y-6">
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold text-slate-900">
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold text-slate-900 dark:text-slate-100">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 text-white shadow-sm">
             <MessageCircle className="h-5 w-5" />
           </span>
           Mesajlar
         </h1>
         <Card>
-          <CardContent className="pt-5 text-sm text-slate-500">
+          <CardContent className="pt-5 text-sm text-slate-500 dark:text-slate-400">
             Henüz bir koça atanmadın. Atandığında koçunla buradan yazışabileceksin.
           </CardContent>
         </Card>
@@ -50,7 +50,7 @@ export default async function OgrenciMesajlarPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+      <h1 className="flex items-center gap-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">
         <MessageCircle className="h-6 w-6 text-indigo-600" />
         Mesajlar
       </h1>

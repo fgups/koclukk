@@ -14,7 +14,7 @@ export function BadgeList({ badges }: { badges: BadgeType[] }) {
         <div
           key={badge.id}
           className={`flex flex-col items-center rounded-xl border p-3 text-center ${
-            badge.earned ? "border-slate-200 bg-white shadow-sm" : "border-dashed border-slate-200 bg-slate-50"
+            badge.earned ? "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm" : "border-dashed border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
           }`}
         >
           <span
@@ -24,10 +24,10 @@ export function BadgeList({ badges }: { badges: BadgeType[] }) {
           >
             <Award className="h-5 w-5" />
           </span>
-          <p className={`mt-2 text-xs font-semibold ${badge.earned ? "text-slate-900" : "text-slate-400"}`}>
+          <p className={`mt-2 text-xs font-semibold ${badge.earned ? "text-slate-900 dark:text-slate-100" : "text-slate-400 dark:text-slate-500"}`}>
             {badge.label}
           </p>
-          <p className="mt-0.5 text-[11px] leading-tight text-slate-400">{badge.description}</p>
+          <p className="mt-0.5 text-[11px] leading-tight text-slate-400 dark:text-slate-500">{badge.description}</p>
         </div>
       ))}
     </div>

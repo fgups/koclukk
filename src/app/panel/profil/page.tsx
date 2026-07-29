@@ -31,13 +31,13 @@ export default async function ProfilPage({
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold text-slate-900">
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold text-slate-900 dark:text-slate-100">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 text-white shadow-sm">
             <UserCircle className="h-5 w-5" />
           </span>
           Profilim
         </h1>
-        <p className="mt-1 text-sm text-slate-500">Bilgilerini güncel tut.</p>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Bilgilerini güncel tut.</p>
       </div>
 
       {success && (
@@ -74,7 +74,7 @@ export default async function ProfilPage({
                   name="avatar"
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
-                  className="block text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200"
+                  className="block text-sm text-slate-600 dark:text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200"
                 />
               </div>
             </div>
@@ -143,10 +143,10 @@ export default async function ProfilPage({
             </div>
 
             {profile.role === "student" && (
-              <div className="space-y-4 border-t border-slate-100 pt-5">
+              <div className="space-y-4 border-t border-slate-100 dark:border-slate-800 pt-5">
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-900">YKS Hedeflerim</h3>
-                  <p className="mt-0.5 text-xs text-slate-500">Panelindeki hedef kartlarında ve ilerleme çubuğunda kullanılır.</p>
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">YKS Hedeflerim</h3>
+                  <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Panelindeki hedef kartlarında ve ilerleme çubuğunda kullanılır.</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>

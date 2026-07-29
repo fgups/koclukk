@@ -136,17 +136,17 @@ export default async function OgrenciDetayPage({
           </span>
         )}
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">{s.full_name || "İsimsiz Öğrenci"}</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">{s.full_name || "İsimsiz Öğrenci"}</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             {s.track ? TRACK_LABELS[s.track] : "Alan belirtilmemiş"}
             {" · "}Toplam {total} soru çözülmüş, {untouchedCount} konuya hiç başlanmamış
           </p>
-          <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500">
+          <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
             {s.school && <span>🏫 {s.school}</span>}
             {s.grade_level && <span>{GRADE_LEVEL_LABELS[s.grade_level]}</span>}
             {s.phone && <span>📞 {s.phone}</span>}
           </p>
-          {s.bio && <p className="mt-2 max-w-xl text-sm text-slate-600">{s.bio}</p>}
+          {s.bio && <p className="mt-2 max-w-xl text-sm text-slate-600 dark:text-slate-400">{s.bio}</p>}
           <div className="mt-2 w-fit">
             <RiskBadge risk={risk} />
           </div>
@@ -173,12 +173,12 @@ export default async function OgrenciDetayPage({
         </CardHeader>
         <CardContent>
           {weakTopics.length === 0 ? (
-            <p className="text-sm text-slate-500">Henüz yeterli veri yok.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Henüz yeterli veri yok.</p>
           ) : (
             <ul className="space-y-2">
               {weakTopics.map((t) => (
                 <li key={t.topic_id} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-800">
+                  <span className="text-slate-800 dark:text-slate-200">
                     {t.subject_name} · {t.topic_name}
                   </span>
                   <Badge variant={((t.accuracy ?? 0) < 0.5 ? "danger" : "warning") as "danger" | "warning"}>
@@ -203,14 +203,14 @@ export default async function OgrenciDetayPage({
         </CardHeader>
         <CardContent>
           {!recentLogs || recentLogs.length === 0 ? (
-            <p className="text-sm text-slate-500">Henüz soru kaydı eklenmedi.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Henüz soru kaydı eklenmedi.</p>
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
               {(recentLogs as unknown as RecentLog[]).map((log) => (
                 <li key={log.id} className="flex items-center justify-between py-3 text-sm">
                   <div>
-                    <p className="font-medium text-slate-900">{log.topics?.name ?? "Konu"}</p>
-                    <p className="text-slate-500">
+                    <p className="font-medium text-slate-900 dark:text-slate-100">{log.topics?.name ?? "Konu"}</p>
+                    <p className="text-slate-500 dark:text-slate-400">
                       {log.topics?.subjects?.name} · {log.log_date}
                     </p>
                   </div>
@@ -240,17 +240,17 @@ export default async function OgrenciDetayPage({
               Not Ekle
             </Button>
           </form>
-          <ul className="space-y-3 border-t border-slate-100 pt-4">
+          <ul className="space-y-3 border-t border-slate-100 dark:border-slate-800 pt-4">
             {((notes ?? []) as CoachNote[]).map((n) => (
               <li key={n.id} className="text-sm">
-                <p className="text-slate-800">{n.note}</p>
-                <p className="mt-0.5 text-xs text-slate-400">
+                <p className="text-slate-800 dark:text-slate-200">{n.note}</p>
+                <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                   {new Date(n.created_at).toLocaleString("tr-TR")}
                 </p>
               </li>
             ))}
             {(!notes || notes.length === 0) && (
-              <li className="text-sm text-slate-500">Henüz not eklenmedi.</li>
+              <li className="text-sm text-slate-500 dark:text-slate-400">Henüz not eklenmedi.</li>
             )}
           </ul>
         </CardContent>
@@ -287,11 +287,11 @@ export default async function OgrenciDetayPage({
             <form action={assignTask} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
               <input type="hidden" name="student_id" value={studentId} />
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500">Başlık</label>
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Başlık</label>
                 <Input name="title" placeholder="Örn. 20 türev sorusu çöz" required />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500">Son Tarih (opsiyonel)</label>
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Son Tarih (opsiyonel)</label>
                 <Input name="due_date" type="date" />
               </div>
               <Button type="submit" size="sm">
@@ -299,18 +299,18 @@ export default async function OgrenciDetayPage({
               </Button>
             </form>
           )}
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-slate-100 dark:divide-slate-800">
             {taskList.map((task) => (
               <li key={task.id} className="flex items-start gap-3 py-3">
                 <div className="pt-0.5">
                   <TaskToggle taskId={task.id} initialDone={task.is_done} />
                 </div>
                 <div className="flex-1">
-                  <p className={`text-sm font-medium ${task.is_done ? "text-slate-400 line-through" : "text-slate-900"}`}>
+                  <p className={`text-sm font-medium ${task.is_done ? "text-slate-400 dark:text-slate-500 line-through" : "text-slate-900 dark:text-slate-100"}`}>
                     {task.title}
                   </p>
                   {task.due_date && (
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       Son tarih: {new Date(task.due_date).toLocaleDateString("tr-TR")}
                     </p>
                   )}
@@ -318,7 +318,7 @@ export default async function OgrenciDetayPage({
               </li>
             ))}
             {taskList.length === 0 && (
-              <li className="py-3 text-sm text-slate-500">Henüz görev atanmadı.</li>
+              <li className="py-3 text-sm text-slate-500 dark:text-slate-400">Henüz görev atanmadı.</li>
             )}
           </ul>
         </CardContent>

@@ -58,20 +58,20 @@ export default async function KocPanelPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold text-slate-900">
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold text-slate-900 dark:text-slate-100">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 text-white shadow-sm">
             <Users2 className="h-5 w-5" />
           </span>
           Öğrencilerim
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           {students.length} öğrenci takip ediyorsun.
         </p>
       </div>
 
       {summaries.length === 0 ? (
         <Card>
-          <CardContent className="pt-5 text-sm text-slate-500">
+          <CardContent className="pt-5 text-sm text-slate-500 dark:text-slate-400">
             Sana atanmış bir öğrenci bulunmuyor. Yönetici seni bir öğrenciye atayabilir.
           </CardContent>
         </Card>
@@ -108,12 +108,12 @@ export default async function KocPanelPage() {
                 </CardHeader>
                 <CardContent className="space-y-2 pt-0">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-500">Toplam çözülen</span>
-                    <span className="font-medium text-slate-900">{total}</span>
+                    <span className="text-slate-500 dark:text-slate-400">Toplam çözülen</span>
+                    <span className="font-medium text-slate-900 dark:text-slate-100">{total}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-500">Doğruluk</span>
-                    <span className="font-medium text-slate-900">
+                    <span className="text-slate-500 dark:text-slate-400">Doğruluk</span>
+                    <span className="font-medium text-slate-900 dark:text-slate-100">
                       {accuracy === null ? "—" : `%${accuracy}`}
                     </span>
                   </div>

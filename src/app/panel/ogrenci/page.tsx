@@ -142,8 +142,8 @@ export default async function OgrenciDashboardPage({
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Merhaba, {profile.full_name || "Öğrenci"} 👋</h1>
-          <p className="mt-1 text-sm text-slate-500">Bugünkü çalışmanı kaydet, ilerlemeni takip et.</p>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Merhaba, {profile.full_name || "Öğrenci"} 👋</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Bugünkü çalışmanı kaydet, ilerlemeni takip et.</p>
         </div>
         {streak > 0 && (
           <span className="flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-700 ring-1 ring-inset ring-amber-200">
@@ -178,8 +178,8 @@ export default async function OgrenciDashboardPage({
               <BarChart3 className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-sm text-slate-500">Güncel TYT Net</p>
-              <p className="text-3xl font-bold text-slate-900">{latestTytNet ?? "—"}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Güncel TYT Net</p>
+              <p className="text-3xl font-bold text-slate-900 dark:text-slate-100">{latestTytNet ?? "—"}</p>
             </div>
           </CardContent>
         </Card>
@@ -189,8 +189,8 @@ export default async function OgrenciDashboardPage({
               <BarChart3 className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-sm text-slate-500">Güncel AYT Net</p>
-              <p className="text-3xl font-bold text-slate-900">{latestAytNet ?? "—"}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Güncel AYT Net</p>
+              <p className="text-3xl font-bold text-slate-900 dark:text-slate-100">{latestAytNet ?? "—"}</p>
             </div>
           </CardContent>
         </Card>
@@ -200,9 +200,9 @@ export default async function OgrenciDashboardPage({
               <GraduationCap className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-sm text-slate-500">Hedef Bölüm</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Hedef Bölüm</p>
               {profile.target_department ? (
-                <p className="text-lg font-bold text-slate-900">{profile.target_department}</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-slate-100">{profile.target_department}</p>
               ) : (
                 <Link href="/panel/profil" className="text-sm font-medium text-indigo-600 hover:underline">
                   Profilinden belirle
@@ -217,9 +217,9 @@ export default async function OgrenciDashboardPage({
               <Trophy className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-sm text-slate-500">Hedef Sıralama</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Hedef Sıralama</p>
               {profile.target_rank ? (
-                <p className="text-3xl font-bold text-slate-900">{profile.target_rank.toLocaleString("tr-TR")}</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-slate-100">{profile.target_rank.toLocaleString("tr-TR")}</p>
               ) : (
                 <Link href="/panel/profil" className="text-sm font-medium text-indigo-600 hover:underline">
                   Profilinden belirle
@@ -234,12 +234,12 @@ export default async function OgrenciDashboardPage({
         <Card>
           <CardContent className="space-y-2 pt-5">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-slate-900">Bugünkü Hedef</span>
-              <span className="text-slate-500">
+              <span className="font-medium text-slate-900 dark:text-slate-100">Bugünkü Hedef</span>
+              <span className="text-slate-500 dark:text-slate-400">
                 {todayTotal} / {dailyGoal} soru · %{dailyGoalPct}
               </span>
             </div>
-            <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
               <div
                 className={`h-full rounded-full transition-all ${dailyGoalPct >= 100 ? "bg-emerald-500" : "bg-indigo-500"}`}
                 style={{ width: `${dailyGoalPct}%` }}
@@ -252,26 +252,26 @@ export default async function OgrenciDashboardPage({
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="pt-5">
-            <p className="text-sm text-slate-500">Bugün Çözülen</p>
-            <p className="text-2xl font-bold text-slate-900">{todayTotal}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Bugün Çözülen</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{todayTotal}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5">
-            <p className="text-sm text-slate-500">Bu Hafta Çözülen</p>
-            <p className="text-2xl font-bold text-slate-900">{weekTotal}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Bu Hafta Çözülen</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{weekTotal}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5">
-            <p className="text-sm text-slate-500">Toplam Çözülen</p>
-            <p className="text-2xl font-bold text-slate-900">{totalSolvedAllTime}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Toplam Çözülen</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{totalSolvedAllTime}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5">
-            <p className="text-sm text-slate-500">Genel Başarı</p>
-            <p className="text-2xl font-bold text-slate-900">
+            <p className="text-sm text-slate-500 dark:text-slate-400">Genel Başarı</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
               {overallAccuracy === null ? "—" : `%${overallAccuracy}`}
             </p>
           </CardContent>
@@ -289,18 +289,18 @@ export default async function OgrenciDashboardPage({
           </CardHeader>
           <CardContent>
             {taskList.length === 0 ? (
-              <p className="text-sm text-slate-500">Bekleyen görevin yok, harika gidiyorsun!</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Bekleyen görevin yok, harika gidiyorsun!</p>
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {taskList.map((task) => (
                   <li key={task.id} className="flex items-start gap-3 py-2.5">
                     <div className="pt-0.5">
                       <TaskToggle taskId={task.id} initialDone={task.is_done} />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-900">{task.title}</p>
+                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{task.title}</p>
                       {task.due_date && (
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
                           Son tarih: {new Date(task.due_date).toLocaleDateString("tr-TR")}
                         </p>
                       )}
@@ -330,15 +330,15 @@ export default async function OgrenciDashboardPage({
             {latestExam ? (
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-slate-900">{latestExam.exam_name}</p>
-                  <p className="text-sm text-slate-500">
+                  <p className="font-medium text-slate-900 dark:text-slate-100">{latestExam.exam_name}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     {latestExam.exam_type} · {new Date(latestExam.exam_date).toLocaleDateString("tr-TR")}
                   </p>
                 </div>
                 <Badge variant="indigo">{latestExam.total_net} net</Badge>
               </div>
             ) : (
-              <p className="text-sm text-slate-500">Henüz deneme kaydı yok.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Henüz deneme kaydı yok.</p>
             )}
           </CardContent>
         </Card>
@@ -383,14 +383,14 @@ export default async function OgrenciDashboardPage({
           </CardHeader>
           <CardContent>
             {!recentLogs || recentLogs.length === 0 ? (
-              <p className="text-sm text-slate-500">Henüz kayıt eklemedin.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Henüz kayıt eklemedin.</p>
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {(recentLogs as unknown as RecentLog[]).map((log) => (
                   <li key={log.id} className="flex items-center justify-between py-3 text-sm">
                     <div>
-                      <p className="font-medium text-slate-900">{log.topics?.name ?? "Konu"}</p>
-                      <p className="text-slate-500">
+                      <p className="font-medium text-slate-900 dark:text-slate-100">{log.topics?.name ?? "Konu"}</p>
+                      <p className="text-slate-500 dark:text-slate-400">
                         {log.topics?.subjects?.name} · {log.log_date}
                       </p>
                     </div>
@@ -447,7 +447,7 @@ export default async function OgrenciDashboardPage({
             </div>
             <Link
               href="/panel/ogrenci/oneriler"
-              className="rounded-lg bg-white px-3 py-2 text-sm font-medium text-violet-700 hover:bg-violet-50"
+              className="rounded-lg bg-white dark:bg-slate-900 px-3 py-2 text-sm font-medium text-violet-700 hover:bg-violet-50"
             >
               Gör
             </Link>
@@ -460,8 +460,8 @@ export default async function OgrenciDashboardPage({
                 <Target className="h-5 w-5" />
               </span>
               <div>
-                <p className="font-medium text-slate-900">Denemelerim</p>
-                <p className="text-sm text-slate-500">Net gelişimini gör</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100">Denemelerim</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Net gelişimini gör</p>
               </div>
             </CardContent>
           </Card>
@@ -473,8 +473,8 @@ export default async function OgrenciDashboardPage({
                 <ClipboardList className="h-5 w-5" />
               </span>
               <div>
-                <p className="font-medium text-slate-900">Görevlerim</p>
-                <p className="text-sm text-slate-500">Koçunun atadıkları</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100">Görevlerim</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Koçunun atadıkları</p>
               </div>
             </CardContent>
           </Card>

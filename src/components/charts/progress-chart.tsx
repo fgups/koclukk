@@ -10,7 +10,7 @@ export interface SubjectAccuracy {
 
 export function SubjectAccuracyChart({ data }: { data: SubjectAccuracy[] }) {
   if (data.length === 0) {
-    return <p className="text-sm text-slate-500">Henüz grafik için yeterli veri yok.</p>;
+    return <p className="text-sm text-slate-500 dark:text-slate-400">Henüz grafik için yeterli veri yok.</p>;
   }
 
   return (

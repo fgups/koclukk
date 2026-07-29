@@ -19,8 +19,8 @@ export default async function KayitPage({
         <Link href="/" className="text-xl font-bold text-indigo-600 lg:hidden">
           Albatros Koçluk
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-900">Öğrenci Kaydı</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <h1 className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">Öğrenci Kaydı</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Soru takibini ve ilerlemeni görmek için hesap oluştur.
         </p>
       </div>
@@ -68,7 +68,7 @@ export default async function KayitPage({
           </form>
         </CardContent>
       </Card>
-      <p className="mt-4 text-center text-sm text-slate-500">
+      <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
         Zaten hesabın var mı?{" "}
         <Link href="/giris" className="font-medium text-indigo-600 hover:underline">
           Giriş yap

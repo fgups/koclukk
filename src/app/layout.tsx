@@ -19,6 +19,14 @@ export const metadata: Metadata = {
     "YKS'ye hazırlanan öğrenciler için soru takibi, ilerleme paneli ve yapay zeka destekli çalışma önerileri sunan koçluk platformu.",
 };
 
+const THEME_INIT_SCRIPT = `
+  (function () {
+    var stored = localStorage.getItem("theme");
+    var dark = stored ? stored === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.classList.toggle("dark", dark);
+  })();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,8 +35,12 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col">
         {children}
         <WhatsAppButton />

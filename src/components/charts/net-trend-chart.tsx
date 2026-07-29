@@ -9,7 +9,7 @@ export interface NetPoint {
 
 export function NetTrendChart({ data }: { data: NetPoint[] }) {
   if (data.length === 0) {
-    return <p className="text-sm text-slate-500">Henüz deneme kaydı yok.</p>;
+    return <p className="text-sm text-slate-500 dark:text-slate-400">Henüz deneme kaydı yok.</p>;
   }
 
   return (

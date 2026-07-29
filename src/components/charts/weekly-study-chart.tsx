@@ -10,7 +10,7 @@ export interface DayPoint {
 export function WeeklyStudyChart({ data }: { data: DayPoint[] }) {
   const hasData = data.some((d) => d.count > 0);
   if (!hasData) {
-    return <p className="text-sm text-slate-500">Son 7 günde henüz kayıt yok.</p>;
+    return <p className="text-sm text-slate-500 dark:text-slate-400">Son 7 günde henüz kayıt yok.</p>;
   }
 
   return (
