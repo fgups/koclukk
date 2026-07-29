@@ -126,6 +126,11 @@ export default function LandingPage() {
           </span>
           <div className="flex items-center gap-2">
             <ThemeToggle className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800" />
+            <Link href="/net-hesaplayici" className="hidden sm:inline-flex">
+              <Button variant="ghost" size="sm">
+                Net Hesaplayıcı
+              </Button>
+            </Link>
             <Link href="/giris">
               <Button variant="ghost" size="sm">
                 Giriş Yap
@@ -262,6 +267,26 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="px-4 pb-4">
+        <Link
+          href="/net-hesaplayici"
+          className="mx-auto flex max-w-4xl items-center justify-between gap-4 rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 via-violet-50 to-fuchsia-50 px-6 py-5 transition-transform hover:-translate-y-0.5 hover:shadow-lg dark:border-indigo-900/50 dark:from-indigo-950 dark:via-violet-950 dark:to-fuchsia-950"
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm">
+              <Calculator className="h-5 w-5" />
+            </span>
+            <div>
+              <p className="font-semibold text-slate-900 dark:text-slate-100">Net Hesaplayıcı</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Hedef üniversite/bölümü seç, YÖK Atlas verisine göre yaklaşık gereken neti gör — ücretsiz, kayıt gerekmez.
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="h-5 w-5 shrink-0 text-indigo-600 dark:text-indigo-400" />
+        </Link>
       </section>
 
       <section className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-12">

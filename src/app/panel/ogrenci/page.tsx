@@ -17,6 +17,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { getDailyActivity, getOverallAccuracy } from "@/lib/stats";
 import { computeCurrentStreak, computeLongestStreak, getBadges } from "@/lib/gamification";
+import { searchPrograms, getNetHistory } from "@/lib/yokatlas";
 import { QuestionLogForm } from "./log-form";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,7 @@ import { StudyHeatmap } from "@/components/progress/study-heatmap";
 import { TaskToggle } from "@/components/tasks/task-toggle";
 import { NetTrendChart } from "@/components/charts/net-trend-chart";
 import { WeeklyStudyChart } from "@/components/charts/weekly-study-chart";
+import { NetHistoryCard } from "@/components/yokatlas/net-history-card";
 import type { MockExam, Task } from "@/lib/types";
 
 function startOfWeekISO(): string {
@@ -130,6 +132,30 @@ export default async function OgrenciDashboardPage({
   const dailyGoal = profile.daily_question_goal;
   const dailyGoalPct = dailyGoal ? Math.max(0, Math.min(100, Math.round((todayTotal / dailyGoal) * 100))) : null;
 
+  const hasTarget = Boolean(profile.target_universite_id && profile.target_birim_grup_id);
+  let targetCurrent: Awaited<ReturnType<typeof searchPrograms>>["content"][number] | null = null;
+  let targetNetHistory: Awaited<ReturnType<typeof getNetHistory>> = [];
+  if (hasTarget && profile.target_universite_id && profile.target_birim_grup_id) {
+    try {
+      const { content } = await searchPrograms({
+        universiteId: [profile.target_universite_id],
+        birimGrupId: [profile.target_birim_grup_id],
+        size: 1,
+      });
+      targetCurrent = content[0] ?? null;
+      const universiteTuru = targetCurrent?.universiteTuru === "VAKIF" ? "VAKIF" : "DEVLET";
+      targetNetHistory = await getNetHistory(
+        profile.target_universite_id,
+        profile.target_birim_grup_id,
+        universiteTuru,
+        targetCurrent?.birimId,
+      );
+    } catch {
+      targetCurrent = null;
+      targetNetHistory = [];
+    }
+  }
+
   type RecentLog = {
     id: string;
     log_date: string;
@@ -200,10 +226,15 @@ export default async function OgrenciDashboardPage({
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-sm">
               <GraduationCap className="h-5 w-5" />
             </span>
-            <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Hedef Bölüm</p>
-              {profile.target_department ? (
-                <p className="text-lg font-bold text-slate-900 dark:text-slate-100">{profile.target_department}</p>
+            <div className="min-w-0">
+              <p className="text-sm text-slate-500 dark:text-slate-400">Hedef Program</p>
+              {hasTarget ? (
+                <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
+                  {profile.target_birim_grup_adi}
+                  <span className="block truncate text-xs font-normal text-slate-500 dark:text-slate-400">
+                    {profile.target_universite_adi}
+                  </span>
+                </p>
               ) : (
                 <Link href="/panel/profil" className="text-sm font-medium text-indigo-600 hover:underline">
                   Profilinden belirle
@@ -218,18 +249,33 @@ export default async function OgrenciDashboardPage({
               <Trophy className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Hedef Sıralama</p>
-              {profile.target_rank ? (
-                <p className="text-3xl font-bold text-slate-900 dark:text-slate-100">{profile.target_rank.toLocaleString("tr-TR")}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Güncel Başarı Sırası</p>
+              {targetCurrent?.basariSirasi ? (
+                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                  {targetCurrent.basariSirasi.toLocaleString("tr-TR")}
+                </p>
               ) : (
-                <Link href="/panel/profil" className="text-sm font-medium text-indigo-600 hover:underline">
-                  Profilinden belirle
-                </Link>
+                <p className="text-sm text-slate-400 dark:text-slate-500">—</p>
               )}
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {hasTarget && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="h-4 w-4 text-amber-500" />
+              Hedefim: {profile.target_birim_grup_adi} — {profile.target_universite_adi}
+            </CardTitle>
+            <CardDescription>YÖK Atlas verisine göre bu programa yaklaşık ne kadar netle girilmiş.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <NetHistoryCard current={targetCurrent} netHistory={targetNetHistory} />
+          </CardContent>
+        </Card>
+      )}
 
       {dailyGoal !== null && dailyGoalPct !== null && (
         <Card>

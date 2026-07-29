@@ -38,9 +38,11 @@ export interface Profile {
   birth_date: string | null;
   phone: string | null;
   bio: string | null;
-  target_department: string | null;
-  target_rank: number | null;
   daily_question_goal: number | null;
+  target_universite_id: number | null;
+  target_universite_adi: string | null;
+  target_birim_grup_id: number | null;
+  target_birim_grup_adi: string | null;
 }
 
 export interface Subject {

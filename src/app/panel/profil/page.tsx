@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Label, Select, Textarea } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { GRADE_LEVEL_LABELS } from "@/lib/types";
+import { UniversityProgramPicker } from "@/components/yokatlas/university-program-picker";
 
 export default async function ProfilPage({
   searchParams,
@@ -148,27 +149,29 @@ export default async function ProfilPage({
                   <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">YKS Hedeflerim</h3>
                   <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Panelindeki hedef kartlarında ve ilerleme çubuğunda kullanılır.</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="target_department">Hedef Bölüm</Label>
-                    <Input
-                      id="target_department"
-                      name="target_department"
-                      defaultValue={profile.target_department ?? ""}
-                      placeholder="Örn. Bilgisayar Mühendisliği"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="target_rank">Hedef Sıralama</Label>
-                    <Input
-                      id="target_rank"
-                      name="target_rank"
-                      type="number"
-                      min={1}
-                      defaultValue={profile.target_rank ?? ""}
-                      placeholder="Örn. 50000"
-                    />
-                  </div>
+                <div>
+                  <Label>Hedef Üniversite / Bölüm</Label>
+                  <UniversityProgramPicker
+                    initial={
+                      profile.target_universite_id && profile.target_birim_grup_id
+                        ? {
+                            universiteId: profile.target_universite_id,
+                            universiteAdi: profile.target_universite_adi ?? "",
+                            birimGrupId: profile.target_birim_grup_id,
+                            birimGrupAdi: profile.target_birim_grup_adi ?? "",
+                          }
+                        : null
+                    }
+                    hiddenFieldNames={{
+                      universiteId: "target_universite_id",
+                      universiteAdi: "target_universite_adi",
+                      birimGrupId: "target_birim_grup_id",
+                      birimGrupAdi: "target_birim_grup_adi",
+                    }}
+                  />
+                  <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
+                    Seçtiğinde panelinde YÖK Atlas verisine göre yaklaşık hedef net görünür.
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="daily_question_goal">Günlük Soru Hedefi</Label>
