@@ -10,6 +10,7 @@ import {
   Percent,
   Sparkles,
   Target,
+  Timer,
   Trophy,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -435,8 +436,8 @@ export default async function OgrenciDashboardPage({
         </Card>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="border-0 bg-gradient-to-br from-violet-600 to-fuchsia-600 sm:col-span-3 lg:col-span-1">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="border-0 bg-gradient-to-br from-violet-600 to-fuchsia-600 sm:col-span-2 lg:col-span-1">
           <CardContent className="flex items-center justify-between pt-5">
             <div>
               <p className="flex items-center gap-1.5 font-medium text-white">
@@ -475,6 +476,19 @@ export default async function OgrenciDashboardPage({
               <div>
                 <p className="font-medium text-slate-900 dark:text-slate-100">Görevlerim</p>
                 <p className="text-sm text-slate-500 dark:text-slate-400">Koçunun atadıkları</p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/panel/ogrenci/pomodoro">
+          <Card className="h-full transition-all hover:-translate-y-0.5 hover:shadow-lg">
+            <CardContent className="flex items-center gap-3 pt-5">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-sm">
+                <Timer className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="font-medium text-slate-900 dark:text-slate-100">Pomodoro</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Odaklanarak çalış</p>
               </div>
             </CardContent>
           </Card>
