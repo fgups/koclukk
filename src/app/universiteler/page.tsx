@@ -2,7 +2,8 @@ import Link from "next/link";
 import { Building2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { searchPrograms } from "@/lib/yokatlas";
+import { EntityPicker } from "@/components/yokatlas/entity-picker";
+import { searchPrograms, getUniversities, getProgramGroups, getCities } from "@/lib/yokatlas";
 
 export const metadata = {
   title: "Üniversiteler ve Bölümler | Albatros Koçluk",
@@ -15,24 +16,49 @@ const PAGE_SIZE = 25;
 export default async function UniversitelerPage({
   searchParams,
 }: {
-  searchParams: Promise<{ puanTuru?: string; universiteTuru?: string; page?: string }>;
+  searchParams: Promise<{
+    puanTuru?: string;
+    universiteTuru?: string;
+    universiteId?: string;
+    birimGrupId?: string;
+    ilKodu?: string;
+    page?: string;
+  }>;
 }) {
-  const { puanTuru, universiteTuru, page: pageParam } = await searchParams;
+  const { puanTuru, universiteTuru, universiteId, birimGrupId, ilKodu, page: pageParam } = await searchParams;
   const page = Math.max(0, Number(pageParam ?? 0) || 0);
+  const universiteIdNum = Number(universiteId) || undefined;
+  const birimGrupIdNum = Number(birimGrupId) || undefined;
+  const ilKoduNum = Number(ilKodu) || undefined;
 
-  const { content, totalElements, totalPages } = await searchPrograms({
-    puanTuru: puanTuru || undefined,
-    universiteTuru: universiteTuru === "DEVLET" || universiteTuru === "VAKIF" ? universiteTuru : undefined,
-    page,
-    size: PAGE_SIZE,
-    sortBy: "basariSirasi",
-    direction: "ASC",
-  });
+  const [{ content, totalElements, totalPages }, universities, programs, cities] = await Promise.all([
+    searchPrograms({
+      puanTuru: puanTuru || undefined,
+      universiteTuru: universiteTuru === "DEVLET" || universiteTuru === "VAKIF" ? universiteTuru : undefined,
+      universiteId: universiteIdNum ? [universiteIdNum] : undefined,
+      birimGrupId: birimGrupIdNum ? [birimGrupIdNum] : undefined,
+      ilKodu: ilKoduNum ? [ilKoduNum] : undefined,
+      page,
+      size: PAGE_SIZE,
+      sortBy: "basariSirasi",
+      direction: "ASC",
+    }),
+    getUniversities(),
+    getProgramGroups(),
+    getCities(),
+  ]);
+
+  const selectedUniversite = universiteIdNum ? universities.find((u) => u.id === universiteIdNum) : undefined;
+  const selectedProgram = birimGrupIdNum ? programs.find((p) => p.id === birimGrupIdNum) : undefined;
+  const selectedCity = ilKoduNum ? cities.find((c) => c.id === ilKoduNum) : undefined;
 
   function pageHref(p: number) {
     const params = new URLSearchParams();
     if (puanTuru) params.set("puanTuru", puanTuru);
     if (universiteTuru) params.set("universiteTuru", universiteTuru);
+    if (universiteId) params.set("universiteId", universiteId);
+    if (birimGrupId) params.set("birimGrupId", birimGrupId);
+    if (ilKodu) params.set("ilKodu", ilKodu);
     params.set("page", String(p));
     return `/universiteler?${params.toString()}`;
   }
@@ -72,12 +98,33 @@ export default async function UniversitelerPage({
                 Üniversiteler ve Bölümler
               </h1>
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                {totalElements.toLocaleString("tr-TR")} program · YÖK Atlas 2026 verisi · başarı sırasına göre
+                {totalElements.toLocaleString("tr-TR")} program · YÖK Atlas verisi · başarı sırasına göre
               </p>
             </div>
           </div>
 
-          <form className="mt-6 flex flex-wrap gap-3" method="GET">
+          <form className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5" method="GET">
+            <EntityPicker
+              kind="universities"
+              hiddenFieldName="universiteId"
+              initialId={selectedUniversite?.id}
+              initialLabel={selectedUniversite?.name}
+              placeholder="Üniversite ara..."
+            />
+            <EntityPicker
+              kind="programs"
+              hiddenFieldName="birimGrupId"
+              initialId={selectedProgram?.id}
+              initialLabel={selectedProgram?.name}
+              placeholder="Bölüm ara..."
+            />
+            <EntityPicker
+              kind="cities"
+              hiddenFieldName="ilKodu"
+              initialId={selectedCity?.id}
+              initialLabel={selectedCity?.name}
+              placeholder="Şehir ara..."
+            />
             <select
               name="puanTuru"
               defaultValue={puanTuru ?? ""}
@@ -99,7 +146,7 @@ export default async function UniversitelerPage({
               <option value="DEVLET">Devlet</option>
               <option value="VAKIF">Vakıf</option>
             </select>
-            <Button type="submit" size="md">
+            <Button type="submit" size="md" className="sm:col-span-2 lg:col-span-5">
               Filtrele
             </Button>
           </form>
@@ -110,8 +157,10 @@ export default async function UniversitelerPage({
                 <tr className="border-b border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
                   <th className="px-4 py-3 font-medium">Üniversite</th>
                   <th className="px-4 py-3 font-medium">Bölüm</th>
+                  <th className="px-4 py-3 font-medium">Şehir</th>
                   <th className="px-4 py-3 font-medium">Puan Türü</th>
                   <th className="px-4 py-3 font-medium">Kontenjan</th>
+                  <th className="px-4 py-3 font-medium">Yıl</th>
                   <th className="px-4 py-3 font-medium">Taban Puan</th>
                   <th className="px-4 py-3 font-medium">Başarı Sırası</th>
                 </tr>
@@ -121,8 +170,10 @@ export default async function UniversitelerPage({
                   <tr key={p.kilavuzKodu} className="hover:bg-slate-50 dark:hover:bg-slate-900">
                     <td className="px-4 py-3 text-slate-900 dark:text-slate-100">{p.universiteAdi}</td>
                     <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{p.birimAdi}</td>
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{p.ilAdi}</td>
                     <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{p.puanTuru}</td>
                     <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{p.kontenjan}</td>
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{p.yil}</td>
                     <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{p.minPuan?.toFixed(2) ?? "—"}</td>
                     <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">
                       {p.basariSirasi?.toLocaleString("tr-TR") ?? "—"}
@@ -131,7 +182,7 @@ export default async function UniversitelerPage({
                 ))}
                 {content.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                    <td colSpan={8} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
                       Sonuç bulunamadı.
                     </td>
                   </tr>

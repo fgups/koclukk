@@ -34,10 +34,17 @@ export interface ProgramResult {
   universiteTuru: string;
 }
 
+export interface City {
+  id: number;
+  name: string;
+}
+
 export interface NetHistoryRow {
   yil: number;
   birimId: number;
   tabanPuan: number;
+  obp: number | null;
+  katsayi: number | null;
   puanTuru: string;
   tytTrkNet: number | null;
   tytSosNet: number | null;
@@ -81,6 +88,15 @@ export async function getUniversities(): Promise<University[]> {
     universiteAdi: string;
   }[];
   return data.map((u) => ({ id: u.universiteId, name: u.universiteAdi }));
+}
+
+/** Tüm illerin listesi. */
+export async function getCities(): Promise<City[]> {
+  const data = (await getJson("/api/tercih-kilavuz/universite-iller", 60 * 60 * 24)) as {
+    ilKodu: number;
+    ilAdi: string;
+  }[];
+  return data.map((c) => ({ id: c.ilKodu, name: c.ilAdi }));
 }
 
 /** Tüm bölüm/program gruplarının listesi (birim grubu, ör. "Bilgisayar Mühendisliği"). */
@@ -170,6 +186,8 @@ export async function getNetHistory(
       yil: r.yil as number,
       birimId: r.birimId as number,
       tabanPuan: r.tabanPuan as number,
+      obp: (r.obp as number) ?? null,
+      katsayi: (r.katsayi as number) ?? null,
       puanTuru: r.puanTuru as string,
       tytTrkNet: (r.tytTrkNet as number) ?? null,
       tytSosNet: (r.tytSosNet as number) ?? null,

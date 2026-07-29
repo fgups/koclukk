@@ -4,9 +4,12 @@ import { sumNet, TYT_NET_FIELDS, AYT_NET_FIELDS } from "@/lib/yokatlas";
 export function NetHistoryCard({
   current,
   netHistory,
+  userDiplomaNotu = null,
 }: {
   current: ProgramResult | null;
   netHistory: NetHistoryRow[];
+  /** 100 üzerinden diploma notu — ÖSYM'nin resmi "OBP = diploma notu × 5" formülüyle iç hesaplamada ölçeklenir. */
+  userDiplomaNotu?: number | null;
 }) {
   if (!current && netHistory.length === 0) {
     return (
@@ -17,6 +20,17 @@ export function NetHistoryCard({
   }
 
   const latest = netHistory[0];
+  const hasObpData =
+    userDiplomaNotu !== null && !Number.isNaN(userDiplomaNotu) && latest?.katsayi !== null && latest?.obp !== null;
+  // YÖK Atlas'ın döndürdüğü `obp` alanı zaten ×5 ölçekli (AOBP); öğrencinin girdiği
+  // 100'lük diploma notunu aynı ölçeğe getirip öyle karşılaştırıyoruz.
+  const userObpScaled = hasObpData ? userDiplomaNotu! * 5 : null;
+  const userContribution = hasObpData ? Math.round(userObpScaled! * latest.katsayi! * 100) / 100 : null;
+  const lastAdmittedContribution = hasObpData ? Math.round(latest.obp! * latest.katsayi! * 100) / 100 : null;
+  const obpDiff =
+    userContribution !== null && lastAdmittedContribution !== null
+      ? Math.round((userContribution - lastAdmittedContribution) * 100) / 100
+      : null;
 
   return (
     <div className="space-y-4">
@@ -60,6 +74,23 @@ export function NetHistoryCard({
               </p>
             </div>
           </div>
+        </div>
+      )}
+
+      {hasObpData && obpDiff !== null && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-900/20">
+          <p className="text-sm text-amber-900 dark:text-amber-200">
+            Diploma notun ({userDiplomaNotu}) bu bölüme <strong>+{userContribution}</strong> puan katkı sağlıyor. Son
+            yerleşen adayın diploma katkısı <strong>+{lastAdmittedContribution}</strong> puandı (fark:{" "}
+            <strong>
+              {obpDiff >= 0 ? "+" : ""}
+              {obpDiff}
+            </strong>{" "}
+            puan).{" "}
+            {obpDiff >= 0
+              ? "Diploma notun avantajlı — TYT/AYT puanının son yerleşenden biraz daha düşük olması yeterli olabilir."
+              : "Diploma notun dezavantajlı — bu farkı TYT/AYT puanınla kapatman gerekiyor."}
+          </p>
         </div>
       )}
 
