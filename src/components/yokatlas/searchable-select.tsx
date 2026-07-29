@@ -49,7 +49,10 @@ export function SearchableSelect({
   const filtered = useMemo(() => {
     const q = query.trim().toLocaleLowerCase("tr-TR");
     const list = q ? options.filter((o) => o.label.toLocaleLowerCase("tr-TR").includes(q)) : options;
-    return list.slice(0, 50);
+    // Üniversite (~230) ve şehir (~81) listeleri arama yapılmadan da tam görünsün diye
+    // yüksek bir sınır kullanıyoruz; sadece çok büyük listelerde (ör. binlerce bölüm)
+    // DOM'u şişirmeyi önler.
+    return list.slice(0, 500);
   }, [query, options]);
 
   return (
