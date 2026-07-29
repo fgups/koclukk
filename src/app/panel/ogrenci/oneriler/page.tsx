@@ -1,10 +1,12 @@
 import { Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
+import { getRecentAnalysis } from "@/lib/stats";
 import { createRecommendation } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { RecentAnalysisCard } from "@/components/progress/recent-analysis-card";
 import type { AiRecommendation } from "@/lib/types";
 
 export default async function OnerilerPage({
@@ -16,12 +18,15 @@ export default async function OnerilerPage({
   const profile = await requireProfile();
   const supabase = await createClient();
 
-  const { data: recommendations } = await supabase
-    .from("ai_recommendations")
-    .select("*")
-    .eq("student_id", profile.id)
-    .order("created_at", { ascending: false })
-    .limit(10);
+  const [{ data: recommendations }, analysis] = await Promise.all([
+    supabase
+      .from("ai_recommendations")
+      .select("*")
+      .eq("student_id", profile.id)
+      .order("created_at", { ascending: false })
+      .limit(10),
+    getRecentAnalysis(supabase, profile.id, profile.track),
+  ]);
 
   const list = (recommendations ?? []) as AiRecommendation[];
   const latest = list[0];
@@ -48,6 +53,16 @@ export default async function OnerilerPage({
 
       {error && <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
 
+      <Card>
+        <CardHeader>
+          <CardTitle>Son {analysis.windowDays} Gün Analizi</CardTitle>
+          <CardDescription>Çalışma hacmin, doğruluk trendin ve ders dağılımın.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <RecentAnalysisCard analysis={analysis} />
+        </CardContent>
+      </Card>
+
       {!latest ? (
         <Card>
           <CardContent className="pt-5 text-sm text-slate-500 dark:text-slate-400">
@@ -56,7 +71,7 @@ export default async function OnerilerPage({
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-violet-200 bg-gradient-to-br from-violet-50 via-fuchsia-50/60 to-white">
+        <Card className="border-violet-200 bg-gradient-to-br from-violet-50 via-fuchsia-50/60 to-white dark:border-violet-900 dark:from-violet-950 dark:via-fuchsia-950/60 dark:to-slate-900">
           <CardHeader>
             <CardTitle>Bugünün Önerisi</CardTitle>
             <CardDescription>{new Date(latest.created_at).toLocaleString("tr-TR")}</CardDescription>

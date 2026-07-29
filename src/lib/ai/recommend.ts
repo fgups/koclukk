@@ -1,12 +1,6 @@
 import type { Track, TopicStat, AiRecommendation } from "@/lib/types";
-
-// AYT'de öğrencinin alanına göre hangi derslerin onu ilgilendirdiği (basitleştirilmiş eşleme).
-const TRACK_AYT_SUBJECTS: Record<Track, string[]> = {
-  sayisal: ["Matematik", "Geometri", "Fizik", "Kimya", "Biyoloji"],
-  esit_agirlik: ["Matematik", "Geometri", "Edebiyat", "Tarih", "Coğrafya"],
-  sozel: ["Edebiyat", "Tarih", "Coğrafya"],
-  dil: [],
-};
+import { TRACK_AYT_SUBJECTS } from "@/lib/types";
+import type { RecentAnalysis } from "@/lib/stats";
 
 export function filterRelevantTopics(stats: TopicStat[], track: Track | null): TopicStat[] {
   if (!track) return stats;
@@ -64,14 +58,40 @@ const CLOSING_LINES = [
   "Bugünkü hedefini tamamladığında yarın bir adım daha öndesin.",
 ];
 
+function analysisSummaryLine(a: RecentAnalysis): string {
+  const parts: string[] = [`Son ${a.windowDays} günde ${a.totalSolved} soru çözdün, ${a.activeDays} gün aktif oldun.`];
+
+  if (a.accuracyFirstHalf !== null && a.accuracySecondHalf !== null) {
+    const trendText =
+      a.trend === "up"
+        ? `yükseliyor (%${a.accuracyFirstHalf} → %${a.accuracySecondHalf})`
+        : a.trend === "down"
+          ? `düşüyor (%${a.accuracyFirstHalf} → %${a.accuracySecondHalf})`
+          : `%${a.accuracySecondHalf} civarında sabit`;
+    parts.push(`Doğruluk oranın ${trendText}.`);
+  }
+
+  if (a.topSubject) {
+    parts.push(`En çok ${a.topSubject.name} çalıştın.`);
+  }
+
+  if (a.untouchedSubjects.length > 0) {
+    parts.push(`${a.windowDays} gündür hiç dokunmadığın dersler: ${a.untouchedSubjects.slice(0, 4).join(", ")}.`);
+  }
+
+  return parts.join(" ");
+}
+
 /**
  * Kural tabanlı önceliklendirmenin çıktısını, dışarıya API çağrısı yapmadan
  * öğrenciye yönelik somut bir Türkçe günlük çalışma önerisine çevirir.
+ * `analysis` verilirse (son 15 gün) öneri metnine bir trend özeti eklenir.
  */
 export function generateRecommendation(
   fullName: string,
   _track: Track | null,
   priorityTopics: TopicStat[],
+  analysis?: RecentAnalysis,
 ): GenerateResult {
   const top = priorityTopics.slice(0, 3);
 
@@ -96,11 +116,12 @@ export function generateRecommendation(
 
   const name = fullName || "Merhaba";
   const intro = `${name}, bugünkü çalışma önerin:`;
+  const analysisLine = analysis ? analysisSummaryLine(analysis) : null;
   const lines = top.map((t, i) => `${i + 1}. ${suggestionLine(t)}`);
   const closing = CLOSING_LINES[Math.floor(Math.random() * CLOSING_LINES.length)];
 
   return {
-    recommendation_text: [intro, ...lines, "", closing].join("\n"),
+    recommendation_text: [intro, ...(analysisLine ? [analysisLine, ""] : []), ...lines, "", closing].join("\n"),
     focus_topics: focusTopics,
   };
 }

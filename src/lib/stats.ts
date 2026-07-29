@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { GoalProgress, SubjectNet, TopicStat } from "@/lib/types";
+import type { GoalProgress, SubjectNet, Track, TopicStat } from "@/lib/types";
+import { TRACK_AYT_SUBJECTS } from "@/lib/types";
 
 /**
  * Tüm müfredat konularını, verilen öğrencinin soru kayıtlarıyla birleştirip
@@ -173,4 +174,114 @@ export async function getLastActivityDate(
     .limit(1)
     .maybeSingle();
   return data?.log_date ?? null;
+}
+
+export interface RecentAnalysis {
+  windowDays: number;
+  totalSolved: number;
+  activeDays: number;
+  accuracyFirstHalf: number | null;
+  accuracySecondHalf: number | null;
+  trend: "up" | "down" | "flat" | null;
+  topSubject: { name: string; total: number } | null;
+  untouchedSubjects: string[];
+}
+
+/** Öğrencinin son N günlük çalışma düzenini analiz eder: hacim, doğruluk trendi, ders dağılımı. */
+export async function getRecentAnalysis(
+  supabase: SupabaseClient,
+  studentId: string,
+  track: Track | null,
+  days = 15,
+): Promise<RecentAnalysis> {
+  const since = new Date();
+  since.setDate(since.getDate() - (days - 1));
+  const sinceISO = since.toISOString().slice(0, 10);
+  const midpoint = new Date(since);
+  midpoint.setDate(midpoint.getDate() + Math.floor(days / 2));
+  const midpointISO = midpoint.toISOString().slice(0, 10);
+
+  const [{ data: logs }, { data: subjects }, { data: topics }] = await Promise.all([
+    supabase
+      .from("question_logs")
+      .select("topic_id, log_date, correct_count, wrong_count, blank_count")
+      .eq("student_id", studentId)
+      .gte("log_date", sinceISO),
+    supabase.from("subjects").select("id, name, exam_type"),
+    supabase.from("topics").select("id, subject_id"),
+  ]);
+
+  type LogRow = { topic_id: string; log_date: string; correct_count: number; wrong_count: number; blank_count: number };
+  type SubjectRow = { id: string; name: string; exam_type: "TYT" | "AYT" };
+  type TopicRow = { id: string; subject_id: string };
+
+  const topicToSubject = new Map(((topics ?? []) as TopicRow[]).map((t) => [t.id, t.subject_id]));
+  const relevantAytSubjects = track ? new Set(TRACK_AYT_SUBJECTS[track]) : null;
+  const relevantSubjects = ((subjects ?? []) as SubjectRow[]).filter(
+    (s) => s.exam_type === "TYT" || !relevantAytSubjects || relevantAytSubjects.has(s.name),
+  );
+  const subjectNameById = new Map(relevantSubjects.map((s) => [s.id, s.name]));
+
+  const bySubject = new Map<string, number>();
+  const activeDays = new Set<string>();
+  let totalSolved = 0;
+  let firstCorrect = 0;
+  let firstWrong = 0;
+  let secondCorrect = 0;
+  let secondWrong = 0;
+
+  for (const log of (logs ?? []) as LogRow[]) {
+    const count = log.correct_count + log.wrong_count + log.blank_count;
+    totalSolved += count;
+    activeDays.add(log.log_date);
+
+    const subjectId = topicToSubject.get(log.topic_id);
+    if (subjectId && subjectNameById.has(subjectId)) {
+      bySubject.set(subjectId, (bySubject.get(subjectId) ?? 0) + count);
+    }
+
+    if (log.log_date < midpointISO) {
+      firstCorrect += log.correct_count;
+      firstWrong += log.wrong_count;
+    } else {
+      secondCorrect += log.correct_count;
+      secondWrong += log.wrong_count;
+    }
+  }
+
+  const accuracyFirstHalf = firstCorrect + firstWrong > 0 ? Math.round((firstCorrect / (firstCorrect + firstWrong)) * 100) : null;
+  const accuracySecondHalf = secondCorrect + secondWrong > 0 ? Math.round((secondCorrect / (secondCorrect + secondWrong)) * 100) : null;
+
+  let trend: RecentAnalysis["trend"] = null;
+  if (accuracyFirstHalf !== null && accuracySecondHalf !== null) {
+    const diff = accuracySecondHalf - accuracyFirstHalf;
+    trend = diff > 3 ? "up" : diff < -3 ? "down" : "flat";
+  }
+
+  let topSubject: RecentAnalysis["topSubject"] = null;
+  for (const [subjectId, total] of bySubject) {
+    if (!topSubject || total > topSubject.total) {
+      topSubject = { name: subjectNameById.get(subjectId) ?? "?", total };
+    }
+  }
+
+  // Aynı ders adı TYT ve AYT için ayrı satırlar olabilir (örn. "Tarih") — ikisinden
+  // biri çalışılmışsa dersi "dokunulmuş" saymak için isme göre karşılaştırıyoruz.
+  const touchedNames = new Set(
+    [...bySubject.keys()].map((id) => subjectNameById.get(id)).filter((n): n is string => Boolean(n)),
+  );
+  const untouchedSubjects = [...new Set(relevantSubjects.map((s) => s.name))].filter(
+    (name) => !touchedNames.has(name),
+  );
+
+  return {
+    windowDays: days,
+    totalSolved,
+    activeDays: activeDays.size,
+    accuracyFirstHalf,
+    accuracySecondHalf,
+    trend,
+    topSubject,
+    untouchedSubjects,
+  };
 }

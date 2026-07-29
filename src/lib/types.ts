@@ -18,6 +18,14 @@ export const GRADE_LEVEL_LABELS: Record<GradeLevel, string> = {
   mezun: "Mezun",
 };
 
+// AYT'de öğrencinin alanına göre hangi derslerin onu ilgilendirdiği (basitleştirilmiş eşleme).
+export const TRACK_AYT_SUBJECTS: Record<Track, string[]> = {
+  sayisal: ["Matematik", "Geometri", "Fizik", "Kimya", "Biyoloji"],
+  esit_agirlik: ["Matematik", "Geometri", "Edebiyat", "Tarih", "Coğrafya"],
+  sozel: ["Edebiyat", "Tarih", "Coğrafya"],
+  dil: [],
+};
+
 export interface Profile {
   id: string;
   full_name: string;
