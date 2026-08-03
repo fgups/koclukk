@@ -441,9 +441,6 @@ export default function LandingPage() {
                     {c.rank}
                   </span>
                   <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{c.bio}</p>
-                  <p className="mt-3 text-xs font-medium text-indigo-600 dark:text-indigo-400">
-                    Tüm derslerde koçluk
-                  </p>
                 </CardContent>
               </Card>
             ))}
