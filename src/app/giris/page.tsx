@@ -38,7 +38,12 @@ export default async function GirisPage({
               <Input id="email" name="email" type="email" required autoComplete="email" />
             </div>
             <div>
-              <Label htmlFor="password">Şifre</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Şifre</Label>
+                <Link href="/sifremi-unuttum" className="mb-1.5 text-xs font-medium text-indigo-600 hover:underline">
+                  Şifremi unuttum
+                </Link>
+              </div>
               <Input
                 id="password"
                 name="password"

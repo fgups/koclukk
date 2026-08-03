@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { requireProfile } from "@/lib/auth";
 import type { Role } from "@/lib/types";
 
 export async function setRole(formData: FormData) {
@@ -59,6 +61,26 @@ export async function approveStudent(formData: FormData) {
   }
   revalidatePath("/panel/admin");
   redirect("/panel/admin");
+}
+
+export async function sendPasswordReset(formData: FormData) {
+  const profile = await requireProfile();
+  if (profile.role !== "admin") {
+    redirect("/panel/admin?error=" + encodeURIComponent("Yalnızca admin bu işlemi yapabilir."));
+  }
+
+  const email = String(formData.get("email") ?? "");
+  const headersList = await headers();
+  const origin = headersList.get("origin") ?? `https://${headersList.get("host")}`;
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/sifre-sifirla`,
+  });
+  if (error) {
+    redirect("/panel/admin?error=" + encodeURIComponent(error.message));
+  }
+  redirect("/panel/admin?success=" + encodeURIComponent(`${email} adresine sıfırlama maili gönderildi.`));
 }
 
 export async function unassignStudent(formData: FormData) {

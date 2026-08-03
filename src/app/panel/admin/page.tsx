@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
-import { CalendarClock, ShieldCheck, Shield, Users2 } from "lucide-react";
+import { CalendarClock, KeyRound, ShieldCheck, Shield, Users2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
-import { setRole, assignStudent, unassignStudent, setExamDate, approveStudent } from "./actions";
+import { setRole, assignStudent, unassignStudent, setExamDate, approveStudent, sendPasswordReset } from "./actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/input";
@@ -12,18 +12,20 @@ import type { Profile } from "@/lib/types";
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; success?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, success } = await searchParams;
   const profile = await requireProfile();
   if (profile.role !== "admin") redirect("/panel");
 
   const supabase = await createClient();
-  const [{ data: allProfiles }, { data: assignments }, { data: examDateSetting }] = await Promise.all([
-    supabase.from("profiles").select("*").order("created_at"),
-    supabase.from("coach_students").select("coach_id, student_id"),
-    supabase.from("app_settings").select("value").eq("key", "exam_date").maybeSingle(),
-  ]);
+  const [{ data: allProfiles }, { data: assignments }, { data: examDateSetting }, { data: emailRows }] =
+    await Promise.all([
+      supabase.from("profiles").select("*").order("created_at"),
+      supabase.from("coach_students").select("coach_id, student_id"),
+      supabase.from("app_settings").select("value").eq("key", "exam_date").maybeSingle(),
+      supabase.rpc("admin_list_user_emails"),
+    ]);
 
   const currentExamDate = (examDateSetting?.value as string | null) ?? "";
   const profiles = (allProfiles ?? []) as Profile[];
@@ -31,6 +33,9 @@ export default async function AdminPage({
   const coaches = profiles.filter((p) => p.role === "coach" || p.role === "admin");
   const students = profiles.filter((p) => p.role === "student");
   const assignedPairs = new Set((assignments ?? []).map((a) => `${a.coach_id}:${a.student_id}`));
+  const emailById = new Map(
+    ((emailRows ?? []) as { id: string; email: string }[]).map((r) => [r.id, r.email]),
+  );
 
   return (
     <div className="space-y-8">
@@ -39,6 +44,9 @@ export default async function AdminPage({
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Kullanıcı rolleri, koç-öğrenci atamaları ve sınav ayarları.</p>
       </div>
 
+      {success && (
+        <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{success}</p>
+      )}
       {error && <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
 
       {pendingProfiles.length > 0 && (
@@ -110,6 +118,7 @@ export default async function AdminPage({
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">
                   <th className="pb-2 pr-4 font-medium">Kullanıcı</th>
+                  <th className="pb-2 pr-4 font-medium">E-posta</th>
                   <th className="pb-2 pr-4 font-medium">Rol</th>
                   <th className="pb-2 font-medium">İşlem</th>
                 </tr>
@@ -142,6 +151,9 @@ export default async function AdminPage({
                           <span className="font-medium text-slate-900 dark:text-slate-100">{p.full_name || "—"}</span>
                         </div>
                       </td>
+                      <td className="py-2 pr-4 text-slate-500 dark:text-slate-400">
+                        {emailById.get(p.id) ?? "—"}
+                      </td>
                       <td className="py-2 pr-4">
                         <div className="flex flex-wrap gap-1.5">
                           <Badge variant={p.role === "admin" ? "indigo" : p.role === "coach" ? "success" : "neutral"}>
@@ -151,17 +163,33 @@ export default async function AdminPage({
                         </div>
                       </td>
                       <td className="py-2">
-                        <form action={setRole} className="flex items-center gap-2">
-                          <input type="hidden" name="user_id" value={p.id} />
-                          <Select name="role" defaultValue={p.role} className="h-8 w-32 text-xs">
-                            <option value="student">student</option>
-                            <option value="coach">coach</option>
-                            <option value="admin">admin</option>
-                          </Select>
-                          <Button type="submit" size="sm" variant="outline">
-                            Kaydet
-                          </Button>
-                        </form>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <form action={setRole} className="flex items-center gap-2">
+                            <input type="hidden" name="user_id" value={p.id} />
+                            <Select name="role" defaultValue={p.role} className="h-8 w-32 text-xs">
+                              <option value="student">student</option>
+                              <option value="coach">coach</option>
+                              <option value="admin">admin</option>
+                            </Select>
+                            <Button type="submit" size="sm" variant="outline">
+                              Kaydet
+                            </Button>
+                          </form>
+                          {emailById.get(p.id) && (
+                            <form action={sendPasswordReset}>
+                              <input type="hidden" name="email" value={emailById.get(p.id)} />
+                              <Button
+                                type="submit"
+                                size="sm"
+                                variant="ghost"
+                                title="Şifre sıfırlama maili gönder"
+                                aria-label={`${p.full_name} için şifre sıfırlama maili gönder`}
+                              >
+                                <KeyRound className="h-3.5 w-3.5" />
+                              </Button>
+                            </form>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
