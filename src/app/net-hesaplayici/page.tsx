@@ -57,7 +57,7 @@ export default function NetHesaplayiciPage() {
             <p className="text-sm font-medium">Hedefini kaydet, çalışmanı ona göre planla.</p>
             <Link href="/kayit">
               <Button variant="secondary" size="sm" className="group">
-                Ücretsiz Kayıt Ol
+                Kayıt Ol
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Button>
             </Link>

@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
-import { CalendarClock, Shield, Users2 } from "lucide-react";
+import { CalendarClock, ShieldCheck, Shield, Users2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
-import { setRole, assignStudent, unassignStudent, setExamDate } from "./actions";
+import { setRole, assignStudent, unassignStudent, setExamDate, approveStudent } from "./actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/input";
@@ -27,6 +27,7 @@ export default async function AdminPage({
 
   const currentExamDate = (examDateSetting?.value as string | null) ?? "";
   const profiles = (allProfiles ?? []) as Profile[];
+  const pendingProfiles = profiles.filter((p) => !p.approved);
   const coaches = profiles.filter((p) => p.role === "coach" || p.role === "admin");
   const students = profiles.filter((p) => p.role === "student");
   const assignedPairs = new Set((assignments ?? []).map((a) => `${a.coach_id}:${a.student_id}`));
@@ -39,6 +40,42 @@ export default async function AdminPage({
       </div>
 
       {error && <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+
+      {pendingProfiles.length > 0 && (
+        <Card className="border-amber-200 dark:border-amber-900/50">
+          <CardHeader className="flex-row items-center gap-2 space-y-0">
+            <ShieldCheck className="h-5 w-5 text-amber-600" />
+            <div>
+              <CardTitle>Onay Bekleyen Üyeler</CardTitle>
+              <CardDescription>
+                Ödemesi ulaşan öğrenciyi onayla, panele erişimi anında açılır.
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
+              {pendingProfiles.map((p) => (
+                <li key={p.id} className="flex items-center justify-between py-2.5">
+                  <div>
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                      {p.full_name || "İsimsiz Kullanıcı"}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Kayıt: {new Date(p.created_at).toLocaleDateString("tr-TR")}
+                    </p>
+                  </div>
+                  <form action={approveStudent}>
+                    <input type="hidden" name="user_id" value={p.id} />
+                    <Button type="submit" size="sm">
+                      Onayla
+                    </Button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader className="flex-row items-center gap-2 space-y-0">
@@ -106,9 +143,12 @@ export default async function AdminPage({
                         </div>
                       </td>
                       <td className="py-2 pr-4">
-                        <Badge variant={p.role === "admin" ? "indigo" : p.role === "coach" ? "success" : "neutral"}>
-                          {p.role}
-                        </Badge>
+                        <div className="flex flex-wrap gap-1.5">
+                          <Badge variant={p.role === "admin" ? "indigo" : p.role === "coach" ? "success" : "neutral"}>
+                            {p.role}
+                          </Badge>
+                          {!p.approved && <Badge variant="warning">onay bekliyor</Badge>}
+                        </div>
                       </td>
                       <td className="py-2">
                         <form action={setRole} className="flex items-center gap-2">

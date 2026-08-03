@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Clock3 } from "lucide-react";
 import { requireProfile } from "@/lib/auth";
 import { signOut } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -8,6 +9,9 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationBell } from "@/components/notification-bell";
 import { getNotifications } from "@/lib/notifications";
 import { TRACK_LABELS } from "@/lib/types";
+
+const WHATSAPP_NUMBER = "905540049028";
+const WHATSAPP_MESSAGE = "Merhaba, Albatros Koçluk üyeliğimi onaylatmak istiyorum.";
 
 const NAV_BY_ROLE = {
   student: [
@@ -32,6 +36,37 @@ const NAV_BY_ROLE = {
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const profile = await requireProfile();
+
+  if (!profile.approved) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 dark:bg-slate-950">
+        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-md shadow-amber-600/20">
+            <Clock3 className="h-6 w-6" />
+          </span>
+          <h1 className="mt-4 text-xl font-bold text-slate-900 dark:text-slate-100">Hesabın Onay Bekliyor</h1>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+            Kaydın alındı. Üyeliğini aktifleştirmek için ödemeni yapıp WhatsApp&apos;tan bize ulaş, en kısa sürede
+            onaylayıp panele erişimini açalım.
+          </p>
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-2.5 text-sm font-medium text-white shadow-md transition-transform hover:-translate-y-0.5"
+          >
+            WhatsApp&apos;tan Ulaş
+          </a>
+          <form action={signOut} className="mt-3">
+            <Button variant="outline" size="sm" type="submit" className="w-full">
+              Çıkış Yap
+            </Button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   const nav = NAV_BY_ROLE[profile.role];
 
   const supabase = await createClient();

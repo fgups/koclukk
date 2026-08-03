@@ -30,5 +30,10 @@ export async function signUp(formData: FormData) {
     redirect("/panel");
   }
 
-  redirect("/giris?success=" + encodeURIComponent("Kayıt başarılı. E-postanı onayladıktan sonra giriş yapabilirsin."));
+  redirect(
+    "/giris?success=" +
+      encodeURIComponent(
+        "Kayıt başarılı. E-postanı onayladıktan sonra giriş yapabilirsin — üyeliğin, ödemen sonrası onaylandığında aktif olur.",
+      ),
+  );
 }

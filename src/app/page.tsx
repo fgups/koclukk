@@ -31,8 +31,8 @@ const STATS = [
 
 const FAQS = [
   {
-    q: "Platforma kayıt olmak ücretli mi?",
-    a: "Hayır, öğrenci hesabı oluşturmak tamamen ücretsizdir ve kredi kartı istemez.",
+    q: "Platforma nasıl üye olabilirim?",
+    a: "Kayıt formunu doldurduktan sonra WhatsApp'tan bize ulaşıp ödemeni ilet; ödemen onaylandığında hesabın aktifleşir ve panele giriş yapabilirsin.",
   },
   {
     q: "Koçum kim olacak, nasıl atanıyor?",
@@ -172,12 +172,16 @@ export default function LandingPage() {
               koçlarının takibini tek bir panelde birleştirir.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/kayit">
+              <a
+                href="https://wa.me/905540049028?text=Merhaba%2C%20Albatros%20Ko%C3%A7luk%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum."
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Button size="lg" className="group">
-                  Ücretsiz Başla
+                  WhatsApp&apos;tan Başla
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Button>
-              </Link>
+              </a>
               <Link href="/giris">
                 <Button size="lg" variant="outline">
                   Giriş Yap
@@ -185,7 +189,7 @@ export default function LandingPage() {
               </Link>
             </div>
             <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
-              {["Kurulum ücretsiz", "TYT & AYT tam müfredat", "Kredi kartı gerekmez"].map((item) => (
+              {["Kayıt ücretsiz", "TYT & AYT tam müfredat", "Onay sonrası anında erişim"].map((item) => (
                 <li key={item} className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                   {item}

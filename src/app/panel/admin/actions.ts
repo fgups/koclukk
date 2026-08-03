@@ -49,6 +49,18 @@ export async function setExamDate(formData: FormData) {
   redirect("/panel/admin");
 }
 
+export async function approveStudent(formData: FormData) {
+  const supabase = await createClient();
+  const userId = String(formData.get("user_id") ?? "");
+
+  const { error } = await supabase.rpc("admin_approve_student", { p_user_id: userId });
+  if (error) {
+    redirect("/panel/admin?error=" + encodeURIComponent(error.message));
+  }
+  revalidatePath("/panel/admin");
+  redirect("/panel/admin");
+}
+
 export async function unassignStudent(formData: FormData) {
   const supabase = await createClient();
   const coachId = String(formData.get("coach_id") ?? "");

@@ -32,6 +32,7 @@ export interface Profile {
   role: Role;
   track: Track | null;
   created_at: string;
+  approved: boolean;
   avatar_url: string | null;
   school: string | null;
   grade_level: GradeLevel | null;
