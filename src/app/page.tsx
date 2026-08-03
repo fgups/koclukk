@@ -17,6 +17,8 @@ import {
   Globe2,
   Brain,
   Languages,
+  Award,
+  GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -98,6 +100,72 @@ const FEATURES = [
     icon: Users,
     from: "from-amber-500",
     to: "to-orange-500",
+  },
+];
+
+const COACHES = [
+  {
+    name: "Ayşe Yılmaz",
+    university: "Boğaziçi Üniversitesi",
+    department: "Bilgisayar Mühendisliği",
+    rank: "TR 1.850",
+    bio: "Detaycı ve sabırlı; en karmaşık soruyu bile adım adım anlatır.",
+    from: "from-indigo-500",
+    to: "to-blue-500",
+  },
+  {
+    name: "Mehmet Kaya",
+    university: "ODTÜ",
+    department: "Elektrik-Elektronik Mühendisliği",
+    rank: "TR 2.430",
+    bio: "Sınav stratejisi konusunda uzman, zaman yönetimini önceliğe koyar.",
+    from: "from-emerald-500",
+    to: "to-teal-500",
+  },
+  {
+    name: "Zeynep Arslan",
+    university: "İTÜ",
+    department: "Endüstri Mühendisliği",
+    rank: "TR 3.120",
+    bio: "Enerjik ve motive edici; öğrencisinin moralini hiç düşürmez.",
+    from: "from-violet-500",
+    to: "to-fuchsia-500",
+  },
+  {
+    name: "Emre Demir",
+    university: "Hacettepe Üniversitesi",
+    department: "Tıp Fakültesi",
+    rank: "TR 980",
+    bio: "Analitik düşünür; hatalardan ders çıkarmayı önemser.",
+    from: "from-amber-500",
+    to: "to-orange-500",
+  },
+  {
+    name: "Elif Şahin",
+    university: "Koç Üniversitesi",
+    department: "Endüstri Mühendisliği",
+    rank: "TR 4.560",
+    bio: "Empatik yaklaşımıyla öğrencisinin sınav kaygısını azaltır.",
+    from: "from-rose-500",
+    to: "to-pink-500",
+  },
+  {
+    name: "Burak Yıldız",
+    university: "Bilkent Üniversitesi",
+    department: "Bilgisayar Mühendisliği",
+    rank: "TR 2.890",
+    bio: "Disiplinli ve takip edilebilir çalışma programları hazırlar.",
+    from: "from-sky-500",
+    to: "to-indigo-500",
+  },
+  {
+    name: "Selin Çelik",
+    university: "Galatasaray Üniversitesi",
+    department: "Hukuk Fakültesi",
+    rank: "TR 1.640",
+    bio: "Sözel derslerde derinlemesine analiz yapar, ezbersiz öğretir.",
+    from: "from-teal-500",
+    to: "to-emerald-500",
   },
 ];
 
@@ -330,6 +398,52 @@ export default function LandingPage() {
                   </div>
                   <h3 className="mt-4 font-semibold text-slate-900 dark:text-slate-100">{f.title}</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{f.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-4 py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="mx-auto max-w-xl text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
+              Koçlarımızla Tanış
+            </h2>
+            <p className="mt-3 text-slate-600 dark:text-slate-400">
+              Yeni mezun, YKS&apos;yi başarıyla geride bırakmış ve senin yaşadığın süreci daha dün
+              yaşamış koçlar.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {COACHES.map((c) => (
+              <Card
+                key={c.name}
+                className="group border-slate-200/80 text-center transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-300/40 dark:border-slate-800/80"
+              >
+                <CardContent className="pt-6">
+                  <span
+                    className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br ${c.from} ${c.to} text-lg font-bold text-white shadow-md ring-4 ring-white transition-transform group-hover:scale-105 dark:ring-slate-900`}
+                  >
+                    {c.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </span>
+                  <h3 className="mt-3 font-semibold text-slate-900 dark:text-slate-100">{c.name}</h3>
+                  <p className="mt-1 flex items-center justify-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                    <GraduationCap className="h-3.5 w-3.5 shrink-0" />
+                    {c.university}, {c.department}
+                  </p>
+                  <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-950/50 dark:text-amber-400">
+                    <Award className="h-3.5 w-3.5" />
+                    {c.rank}
+                  </span>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{c.bio}</p>
+                  <p className="mt-3 text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                    Tüm derslerde koçluk
+                  </p>
                 </CardContent>
               </Card>
             ))}
